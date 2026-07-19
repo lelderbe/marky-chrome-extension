@@ -1,147 +1,141 @@
-import { mkdir, writeFile } from "node:fs/promises";
+import { mkdir } from "node:fs/promises";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
-import zlib from "node:zlib";
+import sharp from "sharp";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
+const sourceImage = join(__dirname, "..", "assets", "icon-source.png");
 const outputDir = join(__dirname, "..", "public", "icons");
 const sizes = [16, 32, 48, 128];
+const renderSize = 512;
+const contentScale = 0.96;
 
-function crc32(buffer) {
-  let crc = 0xffffffff;
+const colors = {
+  stroke: { r: 26, g: 115, b: 232 },
+  fill: { r: 138, g: 180, b: 248 },
+  shadow: { r: 66, g: 133, b: 244 },
+};
 
-  for (let index = 0; index < buffer.length; index += 1) {
-    crc ^= buffer[index];
-    for (let bit = 0; bit < 8; bit += 1) {
-      const mask = -(crc & 1);
-      crc = (crc >>> 1) ^ (0xedb88320 & mask);
-    }
-  }
+function markExterior(strokeMask, width, height) {
+  const exterior = new Uint8Array(width * height);
+  const queue = [];
 
-  return (crc ^ 0xffffffff) >>> 0;
-}
-
-function createChunk(type, data) {
-  const length = Buffer.alloc(4);
-  length.writeUInt32BE(data.length, 0);
-
-  const typeBuffer = Buffer.from(type);
-  const crc = Buffer.alloc(4);
-  crc.writeUInt32BE(crc32(Buffer.concat([typeBuffer, data])), 0);
-
-  return Buffer.concat([length, typeBuffer, data, crc]);
-}
-
-function drawStar(size) {
-  const pixels = Buffer.alloc(size * size * 4, 0);
-  const centerX = (size - 1) / 2;
-  const centerY = (size - 1) / 2;
-  const outerRadius = size * 0.42;
-  const innerRadius = size * 0.18;
-
-  const setPixel = (x, y, red, green, blue, alpha) => {
-    if (x < 0 || y < 0 || x >= size || y >= size) {
+  const tryPush = (x, y) => {
+    const index = y * width + x;
+    if (x < 0 || y < 0 || x >= width || y >= height || exterior[index] || strokeMask[index]) {
       return;
     }
 
-    const offset = (y * size + x) * 4;
-    pixels[offset] = red;
-    pixels[offset + 1] = green;
-    pixels[offset + 2] = blue;
-    pixels[offset + 3] = alpha;
+    exterior[index] = 1;
+    queue.push(index);
   };
 
-  const pointInPolygon = (x, y, polygon) => {
-    let inside = false;
-
-    for (
-      let index = 0, previousIndex = polygon.length - 1;
-      index < polygon.length;
-      previousIndex = index, index += 1
-    ) {
-      const [xi, yi] = polygon[index];
-      const [xp, yp] = polygon[previousIndex];
-      const intersects =
-        yi > y !== yp > y &&
-        x < ((xp - xi) * (y - yi)) / (yp - yi + Number.EPSILON) + xi;
-
-      if (intersects) {
-        inside = !inside;
-      }
-    }
-
-    return inside;
-  };
-
-  const starPoints = [];
-  for (let pointIndex = 0; pointIndex < 10; pointIndex += 1) {
-    const angle = -Math.PI / 2 + (pointIndex * Math.PI) / 5;
-    const radius = pointIndex % 2 === 0 ? outerRadius : innerRadius;
-    starPoints.push([
-      centerX + Math.cos(angle) * radius,
-      centerY + Math.sin(angle) * radius,
-    ]);
+  for (let x = 0; x < width; x += 1) {
+    tryPush(x, 0);
+    tryPush(x, height - 1);
   }
 
-  for (let y = 0; y < size; y += 1) {
-    for (let x = 0; x < size; x += 1) {
-      if (pointInPolygon(x + 0.5, y + 0.5, starPoints)) {
-        setPixel(x, y, 251, 188, 5, 255);
-      }
-    }
+  for (let y = 0; y < height; y += 1) {
+    tryPush(0, y);
+    tryPush(width - 1, y);
   }
 
-  if (size >= 24) {
-    const badgeRadius = size * 0.16;
-    const badgeCenterX = size * 0.78;
-    const badgeCenterY = size * 0.78;
+  while (queue.length > 0) {
+    const index = queue.pop();
+    const x = index % width;
+    const y = Math.floor(index / width);
 
-    for (let y = 0; y < size; y += 1) {
-      for (let x = 0; x < size; x += 1) {
-        const distance = Math.hypot(x - badgeCenterX, y - badgeCenterY);
-        if (distance <= badgeRadius) {
-          setPixel(x, y, 26, 115, 232, 255);
-        }
+    tryPush(x - 1, y);
+    tryPush(x + 1, y);
+    tryPush(x, y - 1);
+    tryPush(x, y + 1);
+  }
+
+  return exterior;
+}
+
+function setPixel(pixels, width, x, y, color, alpha = 255) {
+  if (x < 0 || y < 0 || x >= width || y >= pixels.length / (width * 4)) {
+    return;
+  }
+
+  const offset = (y * width + x) * 4;
+  pixels[offset] = color.r;
+  pixels[offset + 1] = color.g;
+  pixels[offset + 2] = color.b;
+  pixels[offset + 3] = alpha;
+}
+
+function createColoredIcon(sourceData, width, height) {
+  const pixels = Buffer.alloc(width * height * 4, 0);
+  const strokeMask = new Uint8Array(width * height);
+
+  for (let index = 0; index < width * height; index += 1) {
+    const alpha = sourceData[index * 4 + 3];
+    strokeMask[index] = alpha > 64 ? 1 : 0;
+  }
+
+  const exterior = markExterior(strokeMask, width, height);
+
+  for (let y = 0; y < height; y += 1) {
+    for (let x = 0; x < width; x += 1) {
+      const index = y * width + x;
+
+      if (strokeMask[index]) {
+        setPixel(pixels, width, x, y, colors.stroke);
+        continue;
       }
+
+      if (exterior[index]) {
+        continue;
+      }
+
+      const shadowStart = width * 0.84;
+      const fillColor = x >= shadowStart ? colors.shadow : colors.fill;
+      setPixel(pixels, width, x, y, fillColor);
     }
   }
 
   return pixels;
 }
 
-function createPng(size) {
-  const raw = Buffer.concat(
-    Array.from({ length: size }, (_, row) => {
-      const rowStart = row * size * 4;
-      const rowData = drawStar(size).subarray(rowStart, rowStart + size * 4);
-      return Buffer.concat([Buffer.from([0]), rowData]);
-    }),
-  );
+const maxContentSize = Math.round(renderSize * contentScale);
+const preparedSource = await sharp(sourceImage)
+  .trim()
+  .resize(maxContentSize, maxContentSize, {
+    fit: "inside",
+    background: { r: 0, g: 0, b: 0, alpha: 0 },
+  })
+  .toBuffer();
 
-  const compressed = zlib.deflateSync(raw);
-  const signature = Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]);
-  const ihdr = Buffer.alloc(13);
-  ihdr.writeUInt32BE(size, 0);
-  ihdr.writeUInt32BE(size, 4);
-  ihdr[8] = 8;
-  ihdr[9] = 6;
-  ihdr[10] = 0;
-  ihdr[11] = 0;
-  ihdr[12] = 0;
+const { data, info } = await sharp({
+  create: {
+    width: renderSize,
+    height: renderSize,
+    channels: 4,
+    background: { r: 0, g: 0, b: 0, alpha: 0 },
+  },
+})
+  .composite([{ input: preparedSource, gravity: "center" }])
+  .ensureAlpha()
+  .raw()
+  .toBuffer({ resolveWithObject: true });
 
-  return Buffer.concat([
-    signature,
-    createChunk("IHDR", ihdr),
-    createChunk("IDAT", compressed),
-    createChunk("IEND", Buffer.alloc(0)),
-  ]);
-}
+const coloredIcon = createColoredIcon(data, info.width, info.height);
 
 await mkdir(outputDir, { recursive: true });
 
 for (const size of sizes) {
-  const png = createPng(size);
-  await writeFile(join(outputDir, `icon${size}.png`), png);
+  await sharp(coloredIcon, {
+    raw: {
+      width: info.width,
+      height: info.height,
+      channels: 4,
+    },
+  })
+    .resize(size, size)
+    .png()
+    .toFile(join(outputDir, `icon${size}.png`));
 }
 
 console.log(`Generated icons in ${outputDir}`);
