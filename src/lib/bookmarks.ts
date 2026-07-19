@@ -1,5 +1,7 @@
 import { UNSUPPORTED_URL_PREFIXES } from "../types";
 
+const BOOKMARKS_BAR_ID = "1";
+
 export function isBookmarkableUrl(url: string | undefined): url is string {
   if (!url) {
     return false;
@@ -35,4 +37,16 @@ export async function saveToFolder(
     title: tab.title ?? url,
     url,
   });
+}
+
+export async function createFolderAndSave(
+  tab: chrome.tabs.Tab,
+  folderTitle: string,
+): Promise<void> {
+  const folder = await chrome.bookmarks.create({
+    parentId: BOOKMARKS_BAR_ID,
+    title: folderTitle.trim(),
+  });
+
+  await saveToFolder(tab, folder.id);
 }

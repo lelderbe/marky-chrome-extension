@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { saveToFolder } from "../lib/bookmarks";
+import { createFolderAndSave, saveToFolder } from "../lib/bookmarks";
 import { filterFolders, getAllFolders } from "../lib/folders";
 import { getActiveTab } from "../lib/tabs";
 import type { BookmarkFolder } from "../types";
@@ -48,9 +48,26 @@ export function App() {
     [folders, filterQuery],
   );
 
+  const trimmedQuery = filterQuery.trim();
+  const canCreateNew =
+    trimmedQuery.length > 0 && visibleFolders.length === 0;
+
   useEffect(() => {
     setSelectedIndex(0);
   }, [filterQuery, folders]);
+
+  const handleCreateNew = useCallback(
+    async (title: string) => {
+      if (!activeTab) {
+        window.close();
+        return;
+      }
+
+      await createFolderAndSave(activeTab, title);
+      window.close();
+    },
+    [activeTab],
+  );
 
   const handleSelectFolder = useCallback(
     async (folderId: string) => {
@@ -69,6 +86,14 @@ export function App() {
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
         window.close();
+        return;
+      }
+
+      if (canCreateNew) {
+        if (event.key === "Enter") {
+          event.preventDefault();
+          void handleCreateNew(trimmedQuery);
+        }
         return;
       }
 
@@ -104,7 +129,14 @@ export function App() {
     return () => {
       window.removeEventListener("keydown", handleKeyDown);
     };
-  }, [handleSelectFolder, selectedIndex, visibleFolders]);
+  }, [
+    canCreateNew,
+    handleCreateNew,
+    handleSelectFolder,
+    selectedIndex,
+    trimmedQuery,
+    visibleFolders,
+  ]);
 
   if (isLoading) {
     return <div className="popup" />;
@@ -116,8 +148,12 @@ export function App() {
       <FolderList
         folders={visibleFolders}
         selectedIndex={selectedIndex}
+        newFolderTitle={canCreateNew ? trimmedQuery : undefined}
         onSelect={(folderId) => {
           void handleSelectFolder(folderId);
+        }}
+        onCreateNew={(title) => {
+          void handleCreateNew(title);
         }}
         onHover={setSelectedIndex}
       />

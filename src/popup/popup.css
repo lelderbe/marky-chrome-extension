@@ -92,6 +92,10 @@ body {
   background: var(--item-hover-bg);
 }
 
+.folder-item--new {
+  color: var(--accent);
+}
+
 .folder-list-empty {
   padding: 12px;
   color: var(--text-secondary);
