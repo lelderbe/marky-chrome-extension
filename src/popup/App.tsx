@@ -1,11 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { saveToFolder } from "../lib/bookmarks";
-import {
-  filterFolders,
-  getAllFolders,
-  sortFoldersWithRecent,
-} from "../lib/folders";
-import { pushRecentFolder, getRecentFolderIds } from "../lib/recent";
+import { filterFolders, getAllFolders } from "../lib/folders";
 import { getActiveTab } from "../lib/tabs";
 import type { BookmarkFolder } from "../types";
 import { FilterInput } from "./components/FilterInput";
@@ -23,9 +18,8 @@ export function App() {
 
     const loadData = async () => {
       try {
-        const [allFolders, recentFolderIds, tab] = await Promise.all([
+        const [allFolders, tab] = await Promise.all([
           getAllFolders(),
-          getRecentFolderIds(),
           getActiveTab(),
         ]);
 
@@ -33,7 +27,7 @@ export function App() {
           return;
         }
 
-        setFolders(sortFoldersWithRecent(allFolders, recentFolderIds));
+        setFolders(allFolders);
         setActiveTab(tab);
       } finally {
         if (isMounted) {
@@ -66,7 +60,6 @@ export function App() {
       }
 
       await saveToFolder(activeTab, folderId);
-      await pushRecentFolder(folderId);
       window.close();
     },
     [activeTab],

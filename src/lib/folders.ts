@@ -14,7 +14,11 @@ function collectFoldersFromNodes(
     }
 
     if (!node.url) {
-      folders.push({ id: node.id, title: node.title });
+      folders.push({
+        id: node.id,
+        title: node.title,
+        dateGroupModified: node.dateGroupModified ?? node.dateAdded ?? 0,
+      });
     }
 
     if (node.children) {
@@ -25,26 +29,12 @@ function collectFoldersFromNodes(
   return folders;
 }
 
-export async function getAllFolders(): Promise<BookmarkFolder[]> {
-  const tree = await chrome.bookmarks.getTree();
-  return collectFoldersFromNodes(tree);
-}
-
-export function sortFoldersWithRecent(
+export function sortFoldersByModifiedDate(
   folders: BookmarkFolder[],
-  recentFolderIds: string[],
 ): BookmarkFolder[] {
-  const folderById = new Map(folders.map((folder) => [folder.id, folder]));
-  const recentFolders = recentFolderIds
-    .map((id) => folderById.get(id))
-    .filter((folder): folder is BookmarkFolder => folder !== undefined);
-
-  const recentIdSet = new Set(recentFolders.map((folder) => folder.id));
-  const remainingFolders = folders
-    .filter((folder) => !recentIdSet.has(folder.id))
-    .sort((left, right) => left.title.localeCompare(right.title));
-
-  return [...recentFolders, ...remainingFolders];
+  return [...folders].sort(
+    (left, right) => right.dateGroupModified - left.dateGroupModified,
+  );
 }
 
 export function filterFolders(
@@ -59,4 +49,9 @@ export function filterFolders(
   return folders.filter((folder) =>
     folder.title.toLowerCase().includes(normalizedQuery),
   );
+}
+
+export async function getAllFolders(): Promise<BookmarkFolder[]> {
+  const tree = await chrome.bookmarks.getTree();
+  return sortFoldersByModifiedDate(collectFoldersFromNodes(tree));
 }

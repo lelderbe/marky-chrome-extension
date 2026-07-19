@@ -3,7 +3,7 @@
   "name": "Marky",
   "version": "1.0.0",
   "description": "Добавляет текущую страницу в закладки с выбором папки",
-  "permissions": ["bookmarks", "tabs", "storage"],
+  "permissions": ["bookmarks", "tabs"],
   "action": {
     "default_title": "Marky",
     "default_popup": "src/popup/index.html",
