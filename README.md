@@ -4,6 +4,10 @@
 
 **EN:** Fast and simple bookmarking for Chrome — pick a folder from a list with search filtering.
 
+[Установить из интернет-магазина Chrome](https://chromewebstore.google.com/detail/ekklkmikngajdgklihnnhcjmbjoefaem?utm_source=item-share-cb) / [Install from the Chrome Web Store](https://chromewebstore.google.com/detail/ekklkmikngajdgklihnnhcjmbjoefaem?utm_source=item-share-cb)
+
+[Changelog](CHANGELOG.md) / [История изменений](CHANGELOG.ru.md)
+
 ## Возможности / Features
 
 - Добавление текущей вкладки в закладки одним кликом
@@ -12,6 +16,7 @@
 - Создание новой папки прямо из фильтра, если совпадений нет (в «Панели закладок»)
 - Навигация с клавиатуры: `↑` / `↓`, `Enter`, `Esc`
 - Если страница уже в закладках — перенос в выбранную папку
+- Иконка на панели инструментов заполнена, если текущая страница уже в избранном, и контурная, если нет
 - Поддержка светлой и тёмной темы (следует системным настройкам)
 - Все данные обрабатываются локально, без серверов
 
@@ -23,6 +28,7 @@
 - Create a new folder from the filter when no matches are found (in the Bookmarks bar)
 - Keyboard navigation: `↑` / `↓`, `Enter`, `Esc`
 - If the page is already bookmarked — moves it to the selected folder
+- Toolbar icon is filled when the current page is bookmarked, and outlined when it is not
 - Light and dark theme support (follows system settings)
 - All data is processed locally, no servers involved
 
@@ -57,7 +63,7 @@ npm run dev
 npm run generate-icons
 ```
 
-Иконки создаются из `assets/icon-source.png` в `public/icons/`.
+Иконки создаются из `assets/icon-source.png` в `public/icons/`: заполненные (`icon{size}.png`) и контурные (`icon-outline{size}.png`).
 
 ### Сборка
 
@@ -77,7 +83,7 @@ npm run package
 
 ## Privacy Policy
 
-**Last updated:** July 19, 2026
+**Last updated:** August 27, 2026
 
 ### English
 
@@ -92,7 +98,7 @@ The Extension does **not** collect, store, transmit, or sell any personal data. 
 The Extension only accesses data necessary for its core function:
 
 - **Bookmarks** — to read your bookmark folders, create new folders, and save or move bookmarks locally in your browser.
-- **Tabs** — to read the URL and title of the current tab when you choose to save it.
+- **Tabs** — to read the URL and title of the current tab when you choose to save it, and to read the URL of the active tab so the toolbar icon can show whether the page is already bookmarked.
 
 All processing happens locally on your device. No information leaves your browser.
 
@@ -123,7 +129,7 @@ Marky («Расширение») — расширение для браузер�
 Расширение обращается только к данным, необходимым для работы:
 
 - **Закладки (bookmarks)** — чтение папок, создание новых папок и создание/перемещение закладок локально в браузере.
-- **Вкладки (tabs)** — получение URL и заголовка текущей вкладки при сохранении.
+- **Вкладки (tabs)** — получение URL и заголовка текущей вкладки при сохранении, а также URL активной вкладки, чтобы иконка на панели показывала, есть ли страница в избранном.
 
 Вся обработка происходит локально на вашем устройстве. Информация не покидает браузер.
 
@@ -143,10 +149,13 @@ Marky («Расширение») — расширение для браузер�
 
 ```
 marky-chrome-extension/
+├── CHANGELOG.md         # Changelog (English)
+├── CHANGELOG.ru.md      # История изменений (русский)
 ├── assets/              # Исходник иконки
 ├── public/icons/        # Сгенерированные иконки расширения
 ├── scripts/             # generate-icons.mjs, package.mjs
 ├── src/
+│   ├── background.ts    # Service worker: состояние иконки
 │   ├── lib/             # bookmarks, folders, tabs
 │   ├── popup/           # React UI
 │   └── types/

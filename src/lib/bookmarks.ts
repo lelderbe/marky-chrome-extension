@@ -10,6 +10,17 @@ export function isBookmarkableUrl(url: string | undefined): url is string {
   return !UNSUPPORTED_URL_PREFIXES.some((prefix) => url.startsWith(prefix));
 }
 
+export async function getBookmarksByUrl(
+  url: string,
+): Promise<chrome.bookmarks.BookmarkTreeNode[]> {
+  return chrome.bookmarks.search({ url });
+}
+
+export async function hasBookmarkForUrl(url: string): Promise<boolean> {
+  const existing = await getBookmarksByUrl(url);
+  return existing.some((bookmark) => Boolean(bookmark.url));
+}
+
 export async function saveToFolder(
   tab: chrome.tabs.Tab,
   folderId: string,
@@ -19,7 +30,7 @@ export async function saveToFolder(
     return;
   }
 
-  const existing = await chrome.bookmarks.search({ url });
+  const existing = await getBookmarksByUrl(url);
   const inTarget = existing.find((bookmark) => bookmark.parentId === folderId);
 
   if (inTarget) {

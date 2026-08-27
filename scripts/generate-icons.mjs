@@ -66,7 +66,7 @@ function setPixel(pixels, width, x, y, color, alpha = 255) {
   pixels[offset + 3] = alpha;
 }
 
-function createColoredIcon(sourceData, width, height) {
+function createColoredIcon(sourceData, width, height, filled) {
   const pixels = Buffer.alloc(width * height * 4, 0);
   const strokeMask = new Uint8Array(width * height);
 
@@ -86,7 +86,7 @@ function createColoredIcon(sourceData, width, height) {
         continue;
       }
 
-      if (exterior[index]) {
+      if (!filled || exterior[index]) {
         continue;
       }
 
@@ -121,21 +121,27 @@ const { data, info } = await sharp({
   .raw()
   .toBuffer({ resolveWithObject: true });
 
-const coloredIcon = createColoredIcon(data, info.width, info.height);
+const filledIcon = createColoredIcon(data, info.width, info.height, true);
+const outlineIcon = createColoredIcon(data, info.width, info.height, false);
 
 await mkdir(outputDir, { recursive: true });
 
-for (const size of sizes) {
-  await sharp(coloredIcon, {
-    raw: {
-      width: info.width,
-      height: info.height,
-      channels: 4,
-    },
-  })
-    .resize(size, size)
-    .png()
-    .toFile(join(outputDir, `icon${size}.png`));
+async function writeIconSet(pixels, namePrefix) {
+  for (const size of sizes) {
+    await sharp(pixels, {
+      raw: {
+        width: info.width,
+        height: info.height,
+        channels: 4,
+      },
+    })
+      .resize(size, size)
+      .png()
+      .toFile(join(outputDir, `${namePrefix}${size}.png`));
+  }
 }
+
+await writeIconSet(filledIcon, "icon");
+await writeIconSet(outlineIcon, "icon-outline");
 
 console.log(`Generated icons in ${outputDir}`);

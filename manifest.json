@@ -1,17 +1,21 @@
 {
     "manifest_version": 3,
     "name": "Marky: Quick Bookmark Manager",
-    "version": "1.0.1",
+    "version": "1.1.0",
     "description": "Quick bookmark manager tool to save current page. Quickly pick, filter, or create bookmark folders via keyboard.",
     "permissions": ["bookmarks", "tabs"],
+    "background": {
+        "service_worker": "src/background.ts",
+        "type": "module"
+    },
     "action": {
         "default_title": "Marky",
         "default_popup": "src/popup/index.html",
         "default_icon": {
-            "16": "icons/icon16.png",
-            "32": "icons/icon32.png",
-            "48": "icons/icon48.png",
-            "128": "icons/icon128.png"
+            "16": "icons/icon-outline16.png",
+            "32": "icons/icon-outline32.png",
+            "48": "icons/icon-outline48.png",
+            "128": "icons/icon-outline128.png"
         }
     },
     "icons": {
