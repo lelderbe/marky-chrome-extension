@@ -9,9 +9,12 @@ Also available in [Russian](CHANGELOG.ru.md).
 
 ## [Unreleased]
 
+## [1.1.0] - 2026-08-27
+
 ### Added
 
 - Toolbar icon is filled when the current page is already bookmarked, and outlined when it is not.
+- Keyboard shortcut `⌘B` (macOS) / `Ctrl+B` (Windows/Linux) to show or hide the panel. If it does not bind after install, assign it at `chrome://extensions/shortcuts`.
 - Link to the [Chrome Web Store listing](https://chromewebstore.google.com/detail/ekklkmikngajdgklihnnhcjmbjoefaem?utm_source=item-share-cb).
 - This changelog.
 
@@ -36,6 +39,7 @@ Also available in [Russian](CHANGELOG.ru.md).
 - If the page is already bookmarked, move it to the selected folder.
 - Light and dark theme following system settings.
 
-[Unreleased]: https://github.com/lelderbe/marky-chrome-extension/compare/a3ec00a...HEAD
+[Unreleased]: https://github.com/lelderbe/marky-chrome-extension/compare/release-1.1.0...HEAD
+[1.1.0]: https://github.com/lelderbe/marky-chrome-extension/compare/a3ec00a...release-1.1.0
 [1.0.1]: https://github.com/lelderbe/marky-chrome-extension/compare/04c9ccd...a3ec00a
 [1.0.0]: https://github.com/lelderbe/marky-chrome-extension/commit/04c9ccd
