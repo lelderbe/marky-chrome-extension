@@ -15,6 +15,7 @@
 - Фильтрация папок по названию
 - Создание новой папки прямо из фильтра, если совпадений нет (в «Панели закладок»)
 - Навигация с клавиатуры: `↑` / `↓`, `Enter`, `Esc`
+- Горячая клавиша `⌘B` (macOS) / `Ctrl+B` (Windows/Linux) — показать или скрыть панель
 - Если страница уже в закладках — перенос в выбранную папку
 - Иконка на панели инструментов заполнена, если текущая страница уже в избранном, и контурная, если нет
 - Поддержка светлой и тёмной темы (следует системным настройкам)
@@ -27,6 +28,7 @@
 - Filter folders by name
 - Create a new folder from the filter when no matches are found (in the Bookmarks bar)
 - Keyboard navigation: `↑` / `↓`, `Enter`, `Esc`
+- Keyboard shortcut `⌘B` (macOS) / `Ctrl+B` (Windows/Linux) — show or hide the panel
 - If the page is already bookmarked — moves it to the selected folder
 - Toolbar icon is filled when the current page is bookmarked, and outlined when it is not
 - Light and dark theme support (follows system settings)
@@ -35,18 +37,22 @@
 ## Как пользоваться / How to use
 
 1. Откройте страницу, которую хотите сохранить
-2. Нажмите на иконку Marky на панели инструментов
+2. Нажмите на иконку Marky на панели инструментов или `⌘B` / `Ctrl+B`
 3. При необходимости введите часть названия папки в поле фильтра
 4. Выберите папку кликом или клавишей `Enter`
 5. Если нужной папки нет — введите её название целиком: появится пункт `New: …`, нажмите `Enter` или кликните по нему. Папка будет создана в «Панели закладок», а текущая страница сохранится в неё
 
+Повторное нажатие `⌘B` / `Ctrl+B` скрывает панель. Если сочетание не сработало после установки, назначьте его вручную на странице `chrome://extensions/shortcuts`.
+
 ---
 
 1. Open the page you want to save
-2. Click the Marky icon in the toolbar
+2. Click the Marky icon in the toolbar or press `⌘B` / `Ctrl+B`
 3. Optionally type part of a folder name in the filter field
 4. Select a folder with a click or `Enter`
 5. If the folder doesn't exist — type its full name: a `New: …` option appears; press `Enter` or click it. The folder is created in the Bookmarks bar and the current page is saved there
+
+Press `⌘B` / `Ctrl+B` again to hide the panel. If the shortcut doesn't work after install, assign it manually at `chrome://extensions/shortcuts`.
 
 ## Разработка / Development
 

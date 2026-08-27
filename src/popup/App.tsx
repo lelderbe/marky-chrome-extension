@@ -6,6 +6,18 @@ import type { BookmarkFolder } from "../types";
 import { FilterInput } from "./components/FilterInput";
 import { FolderList } from "./components/FolderList";
 
+function isTogglePanelShortcut(event: KeyboardEvent): boolean {
+  if (event.code !== "KeyB") {
+    return false;
+  }
+
+  if (event.altKey || event.shiftKey) {
+    return false;
+  }
+
+  return event.metaKey || event.ctrlKey;
+}
+
 export function App() {
   const [folders, setFolders] = useState<BookmarkFolder[]>([]);
   const [filterQuery, setFilterQuery] = useState("");
@@ -84,6 +96,12 @@ export function App() {
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
+      if (isTogglePanelShortcut(event)) {
+        event.preventDefault();
+        window.close();
+        return;
+      }
+
       if (event.key === "Escape") {
         window.close();
         return;
@@ -124,10 +142,10 @@ export function App() {
       }
     };
 
-    window.addEventListener("keydown", handleKeyDown);
+    window.addEventListener("keydown", handleKeyDown, true);
 
     return () => {
-      window.removeEventListener("keydown", handleKeyDown);
+      window.removeEventListener("keydown", handleKeyDown, true);
     };
   }, [
     canCreateNew,
