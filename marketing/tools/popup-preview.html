@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="ru">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Marky — обновлённая панель</title>
+<style>
+body{margin:0;background:#f4f7fb;color:#202124;font:15px system-ui,sans-serif}main{max-width:960px;margin:48px auto;padding:0 24px}h1{font-size:28px;margin:0 0 12px}p{line-height:1.6;color:#5f6368}.controls{display:flex;flex-wrap:wrap;gap:16px;margin:24px 0}label{display:flex;flex-direction:column;gap:6px;font-size:13px}select,button{font:inherit;border:1px solid #dadce0;padding:8px;border-radius:6px;background:white;color:#202124}.review{display:flex;gap:32px;align-items:flex-start}.frame{width:280px;min-height:80px;position:relative;border:1px solid #dadce0;border-radius:10px;overflow:hidden;background:white;box-shadow:0 10px 40px #193b6110}iframe{display:block;width:280px;height:560px;border:0}.result{max-width:460px;padding-top:4px}#result{white-space:pre-wrap}a{color:#1a73e8}.closed{padding:24px;font:14px system-ui;color:#188038;display:none}.frame.done iframe{display:none}.frame.done .closed{display:block}@media(max-width:650px){.review{flex-direction:column}}
+</style></head>
+<body><main><h1>Marky — обновлённая панель</h1><p>Настоящий собранный интерфейс с демонстрационными папками. Ваши закладки не читаются и не меняются.</p>
+<div class="controls"><label>Сценарий<select id="scenario"><option value="new">Первое сохранение</option><option value="returning">После первого сохранения</option><option value="saved">Уже сохранённая страница</option><option value="no-shortcut">Сочетание не назначено</option><option value="unsupported">Служебная страница Chrome</option><option value="missing">Нет адреса страницы</option><option value="load-error">Ошибка загрузки, затем повтор</option><option value="save-error">Ошибка сохранения, затем повтор</option><option value="cleanup-error">Ошибка сохранения и очистки папки</option><option value="slow">Медленное сохранение</option><option value="many-folders">Много папок и длинное название</option></select></label><label>Язык<select id="language"><option value="ru">Русский</option><option value="en">English</option></select></label><label>Тема<select id="theme"><option value="light">Светлая</option><option value="dark">Тёмная</option></select></label><button id="reset" type="button">Начать заново</button></div>
+<div class="review"><div class="frame" id="frame"><iframe id="popup" title="Панель Marky"></iframe><div class="closed">Панель закрылась</div></div><div class="result"><h2>Результат действия</h2><p id="result" role="status">Выберите папку и нажмите Enter.</p><p>Для проверки новой папки введите название, которого нет в списке. В сценарии ошибки первое сохранение не сработает; кнопка «Повторить» проверяет восстановление.</p><a href="/marketing/preview.html">Материалы версии 1.1.1</a></div></div></main>
+<script>
+const frame=document.getElementById('popup'),scenario=document.getElementById('scenario'),language=document.getElementById('language'),theme=document.getElementById('theme');
+const start=()=>{document.getElementById('frame').classList.remove('done');document.getElementById('result').textContent='Выберите папку и нажмите Enter.';frame.src='/demo-popup?lang='+language.value+'&scenario='+scenario.value+'&fresh=1';};
+for(const control of [scenario,language,theme]) control.onchange=start;
+document.getElementById('reset').onclick=start;
+frame.onload=()=>{
+ const root=frame.contentDocument.documentElement;
+ if(theme.value==='dark')for(const[key,value]of Object.entries({'--bg':'#292a2d','--text':'#e8eaed','--text-secondary':'#9aa0a6','--border':'#3c4043','--accent':'#8ab4f8','--item-hover-bg':'rgba(138,180,248,.16)'}))root.style.setProperty(key,value);
+ else for(const[key,value]of Object.entries({'--bg':'#fff','--text':'#202124','--text-secondary':'#5f6368','--border':'#dadce0','--accent':'#1a73e8','--item-hover-bg':'#e8f0fe'}))root.style.setProperty(key,value);
+ root.style.colorScheme=theme.value;
+ const fit=()=>{frame.style.height=Math.min(560,frame.contentDocument.getElementById('root')?.offsetHeight||560)+'px';};new ResizeObserver(fit).observe(frame.contentDocument.getElementById('root'));fit();
+};
+window.addEventListener('message',event=>{
+ if(event.origin!==location.origin||event.source!==frame.contentWindow)return;
+ const data=event.data;
+ if(data.type==='marky-demo-state')document.getElementById('result').textContent=(data.bookmarks.length?data.bookmarks.map(bookmark=>'Сохранено в: '+(data.folders.find(folder=>folder.id===bookmark.parentId)?.title||bookmark.parentId)).join('\n'):'Страница ещё не сохранена.')+'\nЗакладок: '+data.bookmarks.length+'\nПодсказка при следующем запуске: '+(data.hasSaved?'скрыта':'показана')+(data.badge?'\nНа иконке: '+data.badge:'');
+ if(data.type==='marky-demo-close')document.getElementById('frame').classList.add('done');
+ if(data.type==='marky-demo-settings')document.getElementById('result').textContent='Откроются настройки: '+data.url;
+});start();
+</script></body></html>

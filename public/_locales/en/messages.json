@@ -1,11 +1,104 @@
 {
-  "extensionName": { "message": "Marky — Save Bookmarks to Folders" },
-  "extensionDescription": { "message": "Save pages to your Chrome bookmark folders with a keyboard shortcut. Find or create a folder and press Enter. No account." },
-  "toggleDescription": { "message": "Show or hide Marky" },
-  "filterPlaceholder": { "message": "Filter..." },
-  "noFolders": { "message": "No folders found" },
+  "extensionName": {
+    "message": "Marky — Save Bookmarks to Folders"
+  },
+  "extensionDescription": {
+    "message": "Save pages to your Chrome bookmark folders with a keyboard shortcut. Find or create a folder and press Enter. No account."
+  },
+  "toggleDescription": {
+    "message": "Show or hide Marky"
+  },
+  "filterPlaceholder": {
+    "message": "Find a folder…"
+  },
+  "noFolders": {
+    "message": "No folders found"
+  },
   "newFolder": {
-    "message": "New: $TITLE$",
-    "placeholders": { "title": { "content": "$1", "example": "React" } }
+    "message": "Create folder “$TITLE$”",
+    "placeholders": {
+      "title": {
+        "content": "$1"
+      }
+    }
+  },
+  "newFolderDescription": {
+    "message": "In the Bookmarks bar. This page will be saved there."
+  },
+  "savePageTo": {
+    "message": "Save page to…"
+  },
+  "help": {
+    "message": "How to use Marky"
+  },
+  "firstSaveHint": {
+    "message": "Type part of a folder name and press Enter to save this page."
+  },
+  "openWithShortcut": {
+    "message": "Open Marky: $SHORTCUT$",
+    "placeholders": {
+      "shortcut": {
+        "content": "$1"
+      }
+    }
+  },
+  "shortcutUnassigned": {
+    "message": "You can assign a keyboard shortcut to open Marky if you like."
+  },
+  "shortcutUnknown": {
+    "message": "You can check your shortcut in Chrome settings."
+  },
+  "configureShortcut": {
+    "message": "Configure shortcut"
+  },
+  "loading": {
+    "message": "Loading folders…"
+  },
+  "saving": {
+    "message": "Saving…"
+  },
+  "loadError": {
+    "message": "Could not load your bookmark folders. Try again."
+  },
+  "saveError": {
+    "message": "Could not save the page. Try again or choose another folder."
+  },
+  "settingsError": {
+    "message": "Could not open shortcut settings. Try again."
+  },
+  "retry": {
+    "message": "Try again"
+  },
+  "unsupportedPage": {
+    "message": "Marky cannot save this Chrome service page. Open a website and try again."
+  },
+  "missingPage": {
+    "message": "The page address is unavailable. Open a website and reopen Marky."
+  },
+  "alreadySavedIn": {
+    "message": "Already saved in: $FOLDER$",
+    "placeholders": {
+      "folder": {
+        "content": "$1"
+      }
+    }
+  },
+  "unknownFolder": {
+    "message": "a bookmark folder"
+  },
+  "currentFolder": {
+    "message": "Saved here"
+  },
+  "keyboardSave": {
+    "message": "↑↓ choose · Enter save"
+  },
+  "keyboardMove": {
+    "message": "↑↓ choose · Enter move"
+  },
+  "keyboardCreate": {
+    "message": "Enter create and save"
+  },
+  "keyboardAlreadySaved": {
+    "message": "Already saved here · Enter close"
   }
 }
