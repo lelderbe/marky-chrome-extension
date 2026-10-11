@@ -9,6 +9,14 @@ Also available in [Russian](CHANGELOG.ru.md).
 
 ## [Unreleased]
 
+## [1.1.1] - 2026-10-11
+
+### Changed
+
+- Clearer store positioning: save pages to existing Chrome bookmark folders from the keyboard.
+- English and Russian extension metadata and popup strings.
+- English and Russian store copy, screenshots, and short demo assets in `marketing/`.
+
 ## [1.1.0] - 2026-08-27
 
 ### Added
@@ -39,7 +47,8 @@ Also available in [Russian](CHANGELOG.ru.md).
 - If the page is already bookmarked, move it to the selected folder.
 - Light and dark theme following system settings.
 
-[Unreleased]: https://github.com/lelderbe/marky-chrome-extension/compare/release-1.1.0...HEAD
+[Unreleased]: https://github.com/lelderbe/marky-chrome-extension/compare/v1.1.1...HEAD
+[1.1.1]: https://github.com/lelderbe/marky-chrome-extension/compare/release-1.1.0...v1.1.1
 [1.1.0]: https://github.com/lelderbe/marky-chrome-extension/compare/a3ec00a...release-1.1.0
 [1.0.1]: https://github.com/lelderbe/marky-chrome-extension/compare/04c9ccd...a3ec00a
 [1.0.0]: https://github.com/lelderbe/marky-chrome-extension/commit/04c9ccd

@@ -1,8 +1,9 @@
 {
     "manifest_version": 3,
-    "name": "Marky: Quick Bookmark Manager",
-    "version": "1.1.0",
-    "description": "Quick bookmark manager tool to save current page. Quickly pick, filter, or create bookmark folders via keyboard.",
+    "name": "__MSG_extensionName__",
+    "version": "1.1.1",
+    "description": "__MSG_extensionDescription__",
+    "default_locale": "en",
     "permissions": ["bookmarks", "tabs"],
     "background": {
         "service_worker": "src/background.ts",
@@ -24,7 +25,7 @@
                 "default": "Ctrl+B",
                 "mac": "Command+B"
             },
-            "description": "Show or hide Marky"
+            "description": "__MSG_toggleDescription__"
         }
     },
     "icons": {

@@ -1,12 +1,20 @@
 # Marky
 
-**RU:** Быстрое и простое добавление страниц в избранное Chrome — с выбором папки из списка и фильтрацией.
+**RU:** Сохраняйте страницы в нужную папку закладок Chrome, не отрывая рук от клавиатуры. Откройте Marky, введите часть названия папки и нажмите Enter.
 
-**EN:** Fast and simple bookmarking for Chrome — pick a folder from a list with search filtering.
+**EN:** Save pages to the right Chrome bookmark folder without reaching for the mouse. Open Marky, type part of a folder name, and press Enter.
+
+Работает с существующими закладками Chrome. Без отдельного аккаунта, импорта и аналитики. / Works with your existing Chrome bookmarks. No separate account, import, or analytics.
 
 [Установить из интернет-магазина Chrome](https://chromewebstore.google.com/detail/ekklkmikngajdgklihnnhcjmbjoefaem?utm_source=item-share-cb) / [Install from the Chrome Web Store](https://chromewebstore.google.com/detail/ekklkmikngajdgklihnnhcjmbjoefaem?utm_source=item-share-cb)
 
 [Changelog](CHANGELOG.md) / [История изменений](CHANGELOG.ru.md)
+
+[Материалы для Chrome Web Store / Store assets](marketing/README.md)
+
+![Marky: open, filter a bookmark folder, and save with Enter](marketing/assets/en/demo.gif)
+
+[Демонстрация на русском](marketing/assets/ru/demo.mp4) / [English demo](marketing/assets/en/demo.mp4)
 
 ## Возможности / Features
 
