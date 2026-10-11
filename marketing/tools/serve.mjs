@@ -12,9 +12,10 @@ createServer(async (req, res) => {
     if (path === '/demo-popup') {
       const lang = url.searchParams.get('lang') === 'ru' ? 'ru' : 'en';
       const messages = JSON.parse(await readFile(resolve(root, `dist/_locales/${lang}/messages.json`), 'utf8'));
+      const options = { scenario: url.searchParams.get('scenario') || 'new', fresh: url.searchParams.get('fresh') === '1', shortcut: url.searchParams.get('shortcut') };
       const adapter = await readFile(resolve(root, 'marketing/tools/demo-adapter.js'), 'utf8');
       const html = (await readFile(resolve(root, 'dist/src/popup/index.html'), 'utf8'))
-        .replace('<head>', `<head><script>window.demoMessages=${JSON.stringify(messages)};window.demoLanguage=${JSON.stringify(lang)};</script><script>${adapter}</script>`)
+        .replace('<head>', `<head><script>window.demoMessages=${JSON.stringify(messages)};window.demoLanguage=${JSON.stringify(lang)};window.demoOptions=${JSON.stringify(options).replace(/</g, '\\u003c')};</script><script>${adapter}</script>`)
         .replace('src="/src/popup/index.js"', 'src="/dist/src/popup/index.js"')
         .replace('href="/index.css"', 'href="/dist/index.css"');
       res.writeHead(200, { 'Content-Type': types['.html'] }); res.end(html); return;

@@ -48,9 +48,11 @@
 2. Нажмите на иконку Marky на панели инструментов или `⌘B` / `Ctrl+B`
 3. При необходимости введите часть названия папки в поле фильтра
 4. Выберите папку кликом или клавишей `Enter`
-5. Если нужной папки нет — введите её название целиком: появится пункт `New: …`, нажмите `Enter` или кликните по нему. Папка будет создана в «Панели закладок», а текущая страница сохранится в неё
+5. Если нужной папки нет — введите её название целиком: появится пункт `Создать папку «…»`, нажмите `Enter` или кликните по нему. Папка будет создана в «Панели закладок», а текущая страница сохранится в неё
 
-Повторное нажатие `⌘B` / `Ctrl+B` скрывает панель. Если сочетание не сработало после установки, назначьте его вручную на странице `chrome://extensions/shortcuts`.
+При первом запуске панель показывает краткую подсказку и фактически назначенное сочетание клавиш. После первого успешного сохранения подсказка скрывается; её можно открыть кнопкой «?». Кнопка «Настроить сочетание» открывает `chrome://extensions/shortcuts`. Повторное нажатие назначенного сочетания скрывает панель.
+
+Если страница уже сохранена, Marky показывает её папку и отмечает её в списке. Выбор другой папки переносит закладку, выбор текущей закрывает панель без изменений. При ошибке панель остаётся открытой и предлагает повторить попытку; успешное сохранение кратко подтверждается отметкой ✓ на иконке.
 
 ---
 
@@ -58,9 +60,11 @@
 2. Click the Marky icon in the toolbar or press `⌘B` / `Ctrl+B`
 3. Optionally type part of a folder name in the filter field
 4. Select a folder with a click or `Enter`
-5. If the folder doesn't exist — type its full name: a `New: …` option appears; press `Enter` or click it. The folder is created in the Bookmarks bar and the current page is saved there
+5. If the folder doesn't exist — type its full name: a `Create folder “…”` option appears; press `Enter` or click it. The folder is created in the Bookmarks bar and the current page is saved there
 
-Press `⌘B` / `Ctrl+B` again to hide the panel. If the shortcut doesn't work after install, assign it manually at `chrome://extensions/shortcuts`.
+On first use, the popup shows brief guidance and the currently assigned shortcut. The guidance hides after the first successful save and remains available through the ‘?’ button. ‘Configure shortcut’ opens `chrome://extensions/shortcuts`. Press the assigned shortcut again to hide the popup.
+
+If the page is already saved, Marky shows its current folder and marks it in the list. Selecting another folder moves the bookmark; selecting its current folder closes the popup without changes. Errors keep the popup open with a Retry action, and a successful save briefly shows ✓ on the toolbar icon.
 
 ## Разработка / Development
 
@@ -86,6 +90,23 @@ npm run build
 ```
 
 Результат — в папке `dist/`.
+
+### Проверка / Verification
+
+```bash
+npm test
+```
+
+Проверки охватывают сохранение и перенос, восстановление после ошибок, горячие клавиши и подтверждение на иконке. / Tests cover saving and moving, recovery after errors, shortcut matching, and toolbar confirmation.
+
+Для просмотра собранной панели с демонстрационными данными: / To preview the built popup with sample data:
+
+```bash
+npm run build
+node marketing/tools/serve.mjs
+```
+
+Откройте `http://127.0.0.1:4178/marketing/tools/popup-preview.html`. Предпросмотр поддерживает первый запуск, существующую закладку, ошибки, два языка и две темы. Личные закладки не читаются и не меняются. / The preview supports first use, existing bookmarks, errors, both languages, and both themes. It does not access or modify personal bookmarks.
 
 ### Архив для Chrome Web Store
 
@@ -118,6 +139,7 @@ The Extension does **not** collect, store, transmit, or sell any personal data. 
 The Extension only accesses data necessary for its core function:
 
 - **Bookmarks** — to read your bookmark folders, create new folders, and save or move bookmarks locally in your browser.
+- **Local preference** — whether the first successful save has happened, so the introductory hint can stay hidden.
 - **Tabs** — to read the URL and title of the current tab when you choose to save it, and to read the URL of the active tab so the toolbar icon can show whether the page is already bookmarked.
 
 All processing happens locally on your device. No information leaves your browser.
@@ -149,6 +171,7 @@ Marky («Расширение») — расширение для браузер�
 Расширение обращается только к данным, необходимым для работы:
 
 - **Закладки (bookmarks)** — чтение папок, создание новых папок и создание/перемещение закладок локально в браузере.
+- **Локальная настройка** — отметка о первом успешном сохранении, чтобы не показывать вводную подсказку при каждом запуске.
 - **Вкладки (tabs)** — получение URL и заголовка текущей вкладки при сохранении, а также URL активной вкладки, чтобы иконка на панели показывала, есть ли страница в избранном.
 
 Вся обработка происходит локально на вашем устройстве. Информация не покидает браузер.

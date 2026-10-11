@@ -9,6 +9,27 @@ Also available in [Russian](CHANGELOG.ru.md).
 
 ## Unreleased
 
+## 1.2.0 — 2026-10-11
+
+### Added
+
+- First-save guidance with the assigned keyboard shortcut and a link to shortcut settings; help remains available after the first save.
+- Current bookmark folder and a “Saved here” marker; keyboard hints distinguish saving, moving, creating a folder, and closing without changes.
+- Brief confirmation on the toolbar icon after saving.
+- Recoverable loading and saving errors with a Retry button.
+
+### Changed
+
+- Clearer folder search and creation labels, including where a new folder will be created.
+- Wider popup with keyboard selection kept visible in long folder lists.
+
+### Fixed
+
+- Mouse interactions with help and popup text return focus to folder search; saving errors restore focus for another attempt.
+- Repeated Enter or clicks during saving cannot start another operation.
+- Unsupported pages cannot create empty folders; a failed save cleans up its new empty folder or reuses it on retry.
+- Closing the popup with the shortcut follows the user's assigned combination, including non-Latin keyboard layouts.
+
 ## 1.1.1 — 2026-10-11
 
 ### Changed

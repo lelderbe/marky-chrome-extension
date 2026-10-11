@@ -2,6 +2,12 @@ import { UNSUPPORTED_URL_PREFIXES } from "../types";
 
 const BOOKMARKS_BAR_ID = "1";
 
+export class CreatedFolderSaveError extends Error {
+  constructor(readonly folderId: string) {
+    super("The folder was created, but saving the page failed");
+  }
+}
+
 export function isBookmarkableUrl(url: string | undefined): url is string {
   if (!url) {
     return false;
@@ -27,7 +33,7 @@ export async function saveToFolder(
 ): Promise<void> {
   const url = tab.url;
   if (!isBookmarkableUrl(url)) {
-    return;
+    throw new Error("This page cannot be bookmarked");
   }
 
   const existing = await getBookmarksByUrl(url);
@@ -54,10 +60,34 @@ export async function createFolderAndSave(
   tab: chrome.tabs.Tab,
   folderTitle: string,
 ): Promise<void> {
+  if (!isBookmarkableUrl(tab.url)) {
+    throw new Error("This page cannot be bookmarked");
+  }
+
+  const title = folderTitle.trim();
+  if (!title) {
+    throw new Error("Folder name cannot be empty");
+  }
+
   const folder = await chrome.bookmarks.create({
     parentId: BOOKMARKS_BAR_ID,
-    title: folderTitle.trim(),
+    title,
   });
 
-  await saveToFolder(tab, folder.id);
+  try {
+    await saveToFolder(tab, folder.id);
+  } catch (error) {
+    // Remove only our empty folder; never remove bookmarks added meanwhile.
+    let removed = false;
+    try {
+      if ((await chrome.bookmarks.getChildren(folder.id)).length === 0) {
+        await chrome.bookmarks.remove(folder.id);
+        removed = true;
+      }
+    } catch {
+      // Preserve the original save error if cleanup is unavailable.
+    }
+    if (!removed) throw new CreatedFolderSaveError(folder.id);
+    throw error;
+  }
 }
