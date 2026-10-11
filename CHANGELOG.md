@@ -7,9 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 Also available in [Russian](CHANGELOG.ru.md).
 
-## [Unreleased]
+## Unreleased
 
-## [1.1.1] - 2026-10-11
+## 1.1.1 — 2026-10-11
 
 ### Changed
 
@@ -17,7 +17,7 @@ Also available in [Russian](CHANGELOG.ru.md).
 - English and Russian extension metadata and popup strings.
 - English and Russian store copy, screenshots, and short demo assets in `marketing/`.
 
-## [1.1.0] - 2026-08-27
+## 1.1.0 — 2026-08-27
 
 ### Added
 
@@ -30,13 +30,13 @@ Also available in [Russian](CHANGELOG.ru.md).
 
 - Icon paths in `chrome.action.setIcon`: in MV3 they resolve relative to the service worker, not the extension root.
 
-## [1.0.1] - 2026-07-26
+## 1.0.1 — 2026-07-26
 
 ### Changed
 
 - Extension name and description in the manifest for the Chrome Web Store listing.
 
-## [1.0.0] - 2026-07-19
+## 1.0.0 — 2026-07-19
 
 ### Added
 
@@ -46,9 +46,3 @@ Also available in [Russian](CHANGELOG.ru.md).
 - Keyboard navigation: `↑` / `↓`, `Enter`, `Esc`.
 - If the page is already bookmarked, move it to the selected folder.
 - Light and dark theme following system settings.
-
-[Unreleased]: https://github.com/lelderbe/marky-chrome-extension/compare/v1.1.1...HEAD
-[1.1.1]: https://github.com/lelderbe/marky-chrome-extension/compare/release-1.1.0...v1.1.1
-[1.1.0]: https://github.com/lelderbe/marky-chrome-extension/compare/a3ec00a...release-1.1.0
-[1.0.1]: https://github.com/lelderbe/marky-chrome-extension/compare/04c9ccd...a3ec00a
-[1.0.0]: https://github.com/lelderbe/marky-chrome-extension/commit/04c9ccd

@@ -7,9 +7,9 @@
 
 Также доступен на [английском](CHANGELOG.md).
 
-## [Unreleased]
+## Unreleased
 
-## [1.1.1] - 2026-10-11
+## 1.1.1 — 2026-10-11
 
 ### Изменено
 
@@ -17,7 +17,7 @@
 - Английские и русские метаданные и строки интерфейса.
 - Тексты карточки, скриншоты и короткие демонстрации на двух языках в `marketing/`.
 
-## [1.1.0] - 2026-08-27
+## 1.1.0 — 2026-08-27
 
 ### Добавлено
 
@@ -30,13 +30,13 @@
 
 - Пути иконок в `chrome.action.setIcon`: в MV3 они резолвятся относительно service worker, а не корня расширения.
 
-## [1.0.1] - 2026-07-26
+## 1.0.1 — 2026-07-26
 
 ### Изменено
 
 - Название и описание в манифесте для публикации в Chrome Web Store.
 
-## [1.0.0] - 2026-07-19
+## 1.0.0 — 2026-07-19
 
 ### Добавлено
 
@@ -46,9 +46,3 @@
 - Навигация с клавиатуры: `↑` / `↓`, `Enter`, `Esc`.
 - Если страница уже в закладках — перенос в выбранную папку.
 - Светлая и тёмная тема по системным настройкам.
-
-[Unreleased]: https://github.com/lelderbe/marky-chrome-extension/compare/v1.1.1...HEAD
-[1.1.1]: https://github.com/lelderbe/marky-chrome-extension/compare/release-1.1.0...v1.1.1
-[1.1.0]: https://github.com/lelderbe/marky-chrome-extension/compare/a3ec00a...release-1.1.0
-[1.0.1]: https://github.com/lelderbe/marky-chrome-extension/compare/04c9ccd...a3ec00a
-[1.0.0]: https://github.com/lelderbe/marky-chrome-extension/commit/04c9ccd

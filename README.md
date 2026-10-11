@@ -95,6 +95,12 @@ npm run package
 
 Скрипт собирает проект и создаёт `release/marky-extension.zip` — архив **содержимого** `dist/`, готовый к загрузке в [Chrome Web Store Developer Dashboard](https://chrome.google.com/webstore/devconsole).
 
+### Подготовка версии / Release workflow
+
+Версию фиксируем тегом `vX.Y.Z` после слияния изменений в `master`. В обоих CHANGELOG сохраняем описания изменений без ссылок на сравнения версий. Релизные ветки используем только для подготовки: после слияния и создания тега удаляем их локально и на GitHub. Публикация в Chrome Web Store выполняется отдельно.
+
+Tag each version as `vX.Y.Z` after merging changes into `master`. Keep change descriptions in both changelogs without version comparison links. Release branches are temporary: delete them locally and on GitHub after merging and tagging. Chrome Web Store publication is a separate step.
+
 ## Privacy Policy
 
 **Last updated:** August 27, 2026
