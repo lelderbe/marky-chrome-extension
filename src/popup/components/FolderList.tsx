@@ -36,7 +36,7 @@ export function FolderList({
             onClick={handleClick}
             onMouseEnter={() => onHover(0)}
           >
-            New: {newFolderTitle}
+            {chrome.i18n.getMessage("newFolder", newFolderTitle)}
           </button>
         </li>
       </ul>
@@ -44,7 +44,7 @@ export function FolderList({
   }
 
   if (folders.length === 0) {
-    return <div className="folder-list-empty">No folders found</div>;
+    return <div className="folder-list-empty">{chrome.i18n.getMessage("noFolders")}</div>;
   }
 
   return (

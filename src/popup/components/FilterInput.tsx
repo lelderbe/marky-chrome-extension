@@ -14,7 +14,7 @@ export function FilterInput({ value, onChange }: FilterInputProps) {
     <input
       className="filter-input"
       type="text"
-      placeholder="Filter..."
+      placeholder={chrome.i18n.getMessage("filterPlaceholder")}
       value={value}
       onChange={handleChange}
       autoFocus

@@ -1,0 +1,11 @@
+{
+  "extensionName": { "message": "Marky — Save Bookmarks to Folders" },
+  "extensionDescription": { "message": "Save pages to your Chrome bookmark folders with a keyboard shortcut. Find or create a folder and press Enter. No account." },
+  "toggleDescription": { "message": "Show or hide Marky" },
+  "filterPlaceholder": { "message": "Filter..." },
+  "noFolders": { "message": "No folders found" },
+  "newFolder": {
+    "message": "New: $TITLE$",
+    "placeholders": { "title": { "content": "$1", "example": "React" } }
+  }
+}

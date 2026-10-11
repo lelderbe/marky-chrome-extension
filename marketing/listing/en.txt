@@ -1,0 +1,35 @@
+Save the page you're reading to the right Chrome bookmark folder — using your keyboard.
+
+Open Marky, type part of a folder name, and press Enter. Your page goes straight into your existing Chrome bookmarks.
+
+Made for people who keep articles, documentation, and project references in bookmark folders.
+
+WHAT YOU CAN DO
+• Save the current page to any existing bookmark folder.
+• Filter folders by name instead of browsing a folder tree.
+• Use Up / Down and Enter to select a folder; Esc closes Marky.
+• See recently modified folders at the top of the list.
+• Create a folder when there are no matching folders: type its name and select “New: …”. Marky creates it in the Bookmarks bar and saves the current page there.
+• Move an already-bookmarked page to another folder. Choosing a different folder moves the existing bookmark instead of creating another copy.
+• Check the toolbar icon: it is filled when the current page is already bookmarked.
+• Use a light or dark theme that follows your system settings.
+
+GET STARTED
+1. Pin Marky to the Chrome toolbar, or use its keyboard shortcut.
+2. Open a page you want to keep.
+3. Open Marky, type a folder name, and press Enter.
+
+Suggested shortcut: Command+B on macOS; Ctrl+B on Windows and Linux. If it isn't assigned or conflicts with another shortcut, set it at chrome://extensions/shortcuts.
+
+YOUR BOOKMARKS, YOUR BROWSER
+No separate account. No import. Marky works with your existing Chrome bookmark folders.
+
+Marky does not collect personal data or use analytics. It processes bookmarks and tab information on your device, without sending them to Marky servers. Chrome's own bookmark sync settings remain under your control.
+
+PERMISSIONS
+Bookmarks: read folders, create folders, and save or move bookmarks.
+Tabs: read the current page's title and URL, and update the toolbar icon when a page is bookmarked.
+
+English and Russian interface.
+
+Source code and support: https://github.com/lelderbe/marky-chrome-extension

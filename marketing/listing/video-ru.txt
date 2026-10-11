@@ -1,0 +1,12 @@
+Название: Marky — Закладки Chrome в нужную папку с клавиатуры
+
+Откройте Marky, введите название папки и нажмите Enter. В короткой демонстрации показаны сохранение страницы, фильтрация папок закладок и создание новой папки, когда совпадений нет.
+
+Marky работает с вашими существующими закладками Chrome. Без отдельного аккаунта и импорта. Без аналитики Marky.
+
+Установить: https://chromewebstore.google.com/detail/ekklkmikngajdgklihnnhcjmbjoefaem?utm_source=youtube&utm_medium=video&utm_campaign=keyboard-bookmarking-ru
+Исходный код и поддержка: https://github.com/lelderbe/marky-chrome-extension
+
+Предлагаемое сочетание: Command+B на macOS или Ctrl+B на Windows/Linux. При необходимости назначьте его на странице chrome://extensions/shortcuts.
+
+Монтаж кадров интерфейса Marky с демонстрационными папками. Браузерная рамка иллюстрирует контекст.

@@ -1,0 +1,12 @@
+Title: Marky — Save Chrome Bookmarks to the Right Folder
+
+Open Marky, type a folder name, and press Enter. This short demo shows saving a page, filtering bookmark folders, and creating a new folder when there are no matches.
+
+Marky works with your existing Chrome bookmarks. No separate account or import. No Marky analytics.
+
+Install: https://chromewebstore.google.com/detail/ekklkmikngajdgklihnnhcjmbjoefaem?utm_source=youtube&utm_medium=video&utm_campaign=keyboard-bookmarking
+Source and support: https://github.com/lelderbe/marky-chrome-extension
+
+Suggested shortcut: Command+B on macOS or Ctrl+B on Windows/Linux. Assign it at chrome://extensions/shortcuts if needed.
+
+Edited demo using the Marky interface with sample bookmark folders. The browser backdrop is illustrative.

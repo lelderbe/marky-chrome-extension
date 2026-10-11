@@ -9,6 +9,14 @@
 
 ## [Unreleased]
 
+## [1.1.1] - 2026-10-11
+
+### Изменено
+
+- Позиционирование: сохранение страниц в существующие папки закладок Chrome с клавиатуры.
+- Английские и русские метаданные и строки интерфейса.
+- Тексты карточки, скриншоты и короткие демонстрации на двух языках в `marketing/`.
+
 ## [1.1.0] - 2026-08-27
 
 ### Добавлено
@@ -39,7 +47,8 @@
 - Если страница уже в закладках — перенос в выбранную папку.
 - Светлая и тёмная тема по системным настройкам.
 
-[Unreleased]: https://github.com/lelderbe/marky-chrome-extension/compare/release-1.1.0...HEAD
+[Unreleased]: https://github.com/lelderbe/marky-chrome-extension/compare/v1.1.1...HEAD
+[1.1.1]: https://github.com/lelderbe/marky-chrome-extension/compare/release-1.1.0...v1.1.1
 [1.1.0]: https://github.com/lelderbe/marky-chrome-extension/compare/a3ec00a...release-1.1.0
 [1.0.1]: https://github.com/lelderbe/marky-chrome-extension/compare/04c9ccd...a3ec00a
 [1.0.0]: https://github.com/lelderbe/marky-chrome-extension/commit/04c9ccd

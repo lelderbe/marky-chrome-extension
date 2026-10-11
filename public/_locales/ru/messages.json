@@ -1,0 +1,11 @@
+{
+  "extensionName": { "message": "Marky — Закладки в нужную папку" },
+  "extensionDescription": { "message": "Сохраняйте страницы в папки закладок Chrome с клавиатуры. Найдите или создайте папку и нажмите Enter. Без аккаунта." },
+  "toggleDescription": { "message": "Показать или скрыть Marky" },
+  "filterPlaceholder": { "message": "Фильтр..." },
+  "noFolders": { "message": "Папки не найдены" },
+  "newFolder": {
+    "message": "Новая: $TITLE$",
+    "placeholders": { "title": { "content": "$1", "example": "React" } }
+  }
+}
