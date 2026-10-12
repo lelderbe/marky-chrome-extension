@@ -1,6 +1,19 @@
 import { UNSUPPORTED_URL_PREFIXES } from "../types";
 
-const BOOKMARKS_BAR_ID = "1";
+async function getBookmarksBarId(): Promise<string> {
+  const tree = await chrome.bookmarks.getTree();
+  const rootFolders = tree.flatMap((root) => root.children ?? [])
+    .filter((node) => !node.url && !node.unmodifiable);
+  const bars = rootFolders.filter((node) => node.folderType === "bookmarks-bar");
+  // Account and local bars can coexist. Prefer account storage for new folders.
+  const bar = bars.find((node) => node.syncing) ?? bars[0]
+    // Before Chrome 134, folderType was unavailable and the bar had ID "1".
+    ?? rootFolders.find((node) => node.folderType === undefined && node.id === "1");
+  if (!bar) {
+    throw new Error("No writable Bookmarks bar found");
+  }
+  return bar.id;
+}
 
 export class CreatedFolderSaveError extends Error {
   constructor(readonly folderId: string) {
@@ -69,8 +82,9 @@ export async function createFolderAndSave(
     throw new Error("Folder name cannot be empty");
   }
 
+  const parentId = await getBookmarksBarId();
   const folder = await chrome.bookmarks.create({
-    parentId: BOOKMARKS_BAR_ID,
+    parentId,
     title,
   });
 

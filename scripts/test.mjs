@@ -26,13 +26,18 @@ function loadSource(entry, chrome, globals = {}) {
   return load(resolve(root, entry));
 }
 const tab = { id: 1, url: 'https://example.com/article', title: 'Article' };
-function bookmarksFixture({ saved = [], failSave = false, failCleanup = false, concurrentChild = false } = {}) {
+function bookmarksFixture({ saved = [], failSave = false, failCleanup = false, concurrentChild = false,
+  rootFolders = [{ id: '1', title: 'Bookmarks bar', folderType: 'bookmarks-bar', syncing: false }],
+} = {}) {
   const calls = [], nodes = saved.map(node => ({ ...node }));
   let nextId = 100;
   return { calls, nodes, chrome: { bookmarks: {
+    getTree: async () => [{ id: '0', title: '', children: rootFolders }],
     search: async ({ url }) => nodes.filter(node => node.url === url),
     create: async (info) => {
       calls.push(info.url ? 'create-bookmark' : 'create-folder');
+      const parent = [...rootFolders, ...nodes].find(node => node.id === info.parentId);
+      if (!parent || parent.url || parent.unmodifiable) throw new Error('Invalid bookmark parent');
       if (info.url && failSave) throw new Error('Write failed');
       const node = { id: String(nextId++), ...info }; nodes.push(node); return node;
     },
@@ -67,6 +72,51 @@ test('moving preserves the bookmark ID and does not create duplicates', async ()
 test('a new folder is created in the Bookmarks bar and receives the page', async () => {
   const fixture=bookmarksFixture();await loadSource('src/lib/bookmarks.ts',fixture.chrome).createFolderAndSave(tab,'  Project  ');
   assert.equal(fixture.nodes[0].parentId,'1');assert.equal(fixture.nodes[0].title,'Project');assert.equal(fixture.nodes[1].parentId,fixture.nodes[0].id);
+});
+test('folder creation uses the actual Bookmarks bar ID instead of assuming 1', async () => {
+  const fixture = bookmarksFixture({ rootFolders: [
+    { id: '42', title: 'Панель закладок', folderType: 'bookmarks-bar', syncing: true },
+    { id: '43', title: 'Other bookmarks', folderType: 'other', syncing: true },
+  ] });
+  await loadSource('src/lib/bookmarks.ts', fixture.chrome).createFolderAndSave(tab, 'Project');
+  assert.equal(fixture.nodes[0].parentId, '42');
+  assert.equal(fixture.nodes[1].parentId, fixture.nodes[0].id);
+});
+test('account Bookmarks bar is preferred when both local and account bars exist', async () => {
+  const fixture = bookmarksFixture({ rootFolders: [
+    { id: '1', title: 'Bookmarks bar', folderType: 'bookmarks-bar', syncing: false },
+    { id: '42', title: 'Bookmarks bar', folderType: 'bookmarks-bar', syncing: true },
+  ] });
+  await loadSource('src/lib/bookmarks.ts', fixture.chrome).createFolderAndSave(tab, 'Project');
+  assert.equal(fixture.nodes[0].parentId, '42');
+});
+test('older Chrome without folderType still creates folders in the legacy bar', async () => {
+  const fixture = bookmarksFixture({ rootFolders: [{ id: '1', title: 'Панель закладок' }] });
+  await loadSource('src/lib/bookmarks.ts', fixture.chrome).createFolderAndSave(tab, 'Project');
+  assert.equal(fixture.nodes[0].parentId, '1');
+});
+test('missing or managed bars do not create folders in an arbitrary location', async () => {
+  for (const rootFolders of [
+    [],
+    [{ id: '1', title: 'Other bookmarks', folderType: 'other', syncing: false }],
+    [{ id: '1', title: 'Managed bar', folderType: 'bookmarks-bar', unmodifiable: 'managed' }],
+    [{ id: '1', title: 'Managed legacy bar', unmodifiable: 'managed' }],
+  ]) {
+    const fixture = bookmarksFixture({ rootFolders });
+    await assert.rejects(loadSource('src/lib/bookmarks.ts', fixture.chrome).createFolderAndSave(tab, 'Project'));
+    assert.equal(fixture.calls.length, 0);
+    assert.equal(fixture.nodes.length, 0);
+  }
+});
+test('folder creation rechecks the bar after account storage changes', async () => {
+  const rootFolders = [{ id: '1', title: 'Bookmarks bar', folderType: 'bookmarks-bar', syncing: false }];
+  const fixture = bookmarksFixture({ rootFolders });
+  const lib = loadSource('src/lib/bookmarks.ts', fixture.chrome);
+  await lib.createFolderAndSave(tab, 'Before');
+  rootFolders.splice(0, 1, { id: '42', title: 'Bookmarks bar', folderType: 'bookmarks-bar', syncing: true });
+  await lib.createFolderAndSave({ ...tab, url: 'https://example.com/next' }, 'After');
+  assert.equal(fixture.nodes[2].parentId, '42');
+  assert.equal(fixture.nodes[3].parentId, fixture.nodes[2].id);
 });
 test('a failed page save removes the empty folder it just created', async () => {
   const fixture=bookmarksFixture({failSave:true});const lib=loadSource('src/lib/bookmarks.ts',fixture.chrome);
