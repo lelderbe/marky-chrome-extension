@@ -1,0 +1,309 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=1080">
+<title>Marky — Reels</title>
+<style>
+*{box-sizing:border-box}
+html,body{margin:0;background:#dfe7f2}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;color:#172c48}
+.canvas{width:1080px;height:1920px;position:relative;overflow:hidden;background:linear-gradient(180deg,#f6f9fd 0%,#eaf1fa 60%,#dde8f6 100%)}
+.brand{position:absolute;top:150px;left:0;right:0;display:flex;justify-content:center;align-items:center;gap:14px;font-size:34px;font-weight:700;letter-spacing:-.5px;color:#28476d}
+.brand img{width:44px;height:44px}
+.caption{position:absolute;top:240px;left:70px;right:70px;height:250px;display:flex;align-items:center;justify-content:center;text-align:center;font-size:58px;line-height:1.18;font-weight:700;letter-spacing:-1px;color:#132a47}
+.caption span{display:block}
+.stage{position:absolute;left:56px;top:540px;width:520px;height:500px;transform:scale(1.8462);transform-origin:0 0}
+.browser{position:absolute;inset:0;background:#fff;border:1px solid #cfdaea;border-radius:12px;overflow:hidden;box-shadow:0 10px 30px rgba(30,60,110,.12)}
+.tabs{height:40px;background:#e3ebf7;padding:0 14px;display:flex;gap:7px;align-items:center}
+.dot{width:8px;height:8px;border-radius:50%;background:#b8c7da}
+.tab{font-size:11px;background:#fff;padding:9px 14px;margin-left:14px;border-radius:7px 7px 0 0;min-width:190px;align-self:flex-end}
+.toolbar{height:48px;padding:8px 12px;border-bottom:1px solid #e1e8f1;display:flex;gap:11px;align-items:center;color:#6e829b;font-size:13px}
+.address{background:#f0f4fa;flex:1;border-radius:16px;font-size:11px;padding:8px 12px;display:flex;align-items:center;justify-content:space-between;color:#4e6480}
+.star{font-size:17px;line-height:1;color:#5374a0}
+.star.on{color:#1a73e8}
+.marky-action{position:relative;width:30px;height:30px;border:1px solid #c4d5eb;border-radius:50%;background:#eaf2ff;display:flex;align-items:center;justify-content:center}
+.marky-action img{width:19px;height:19px}
+.badge{position:absolute;right:-6px;bottom:-5px;background:#188038;color:#fff;font-size:9px;font-weight:700;border-radius:7px;padding:1px 4px;display:none}
+.article{padding:26px 22px;width:230px}
+.article .label{font-size:9px;color:#1a73e8;font-weight:700;letter-spacing:1.2px}
+.article h2{font-size:21px;line-height:1.2;margin:12px 0;color:#203852;letter-spacing:-.4px}
+.article p{font-size:11px;line-height:1.7;margin:10px 0;color:#73859d}
+.code{font:10px/1.8 ui-monospace,Menlo,monospace;background:#f6f8fb;border:1px solid #e5ebf3;border-radius:6px;padding:10px;margin-top:16px;color:#477096}
+.popup-frame{position:absolute;right:10px;top:92px;width:282px;border:1px solid #ccd5e2;background:#fff;border-radius:6px;overflow:hidden;box-shadow:0 8px 24px rgba(20,40,80,.18);transform-origin:top right;opacity:0}
+.popup-frame iframe{display:block;border:0;width:280px;height:320px;background:#fff}
+/* Illustration of Chrome's built-in bookmark bubble and folder dialog. */
+.bubble{position:absolute;right:52px;top:86px;width:290px;background:#fff;border-radius:10px;box-shadow:0 8px 28px rgba(20,40,80,.22);padding:16px;font-size:12px;color:#202124;opacity:0}
+.bubble h3{margin:0 0 14px;font-size:14px;font-weight:600}
+.field{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.field label{width:62px;color:#5f6368}
+.field .box{flex:1;border:1px solid #c7ccd3;border-radius:5px;padding:7px 9px;display:flex;justify-content:space-between}
+.buttons{display:flex;justify-content:flex-end;gap:8px;margin-top:14px}
+.buttons span{padding:6px 12px;border-radius:14px;border:1px solid #c7ccd3;color:#1a73e8}
+.buttons span.primary{background:#1a73e8;color:#fff;border-color:#1a73e8}
+.menu{position:absolute;left:88px;top:122px;width:186px;background:#fff;border-radius:6px;box-shadow:0 6px 20px rgba(20,40,80,.25);padding:4px 0;display:none}
+.menu div{padding:5px 12px}
+.menu hr{border:0;border-top:1px solid #e3e6ea;margin:4px 0}
+.menu .hot{background:#e8f0fe}
+.dialog{position:absolute;left:40px;top:70px;width:440px;height:400px;background:#fff;border-radius:10px;box-shadow:0 12px 40px rgba(20,40,80,.3);padding:16px;font-size:12px;opacity:0}
+.dialog h3{margin:0 0 12px;font-size:14px;font-weight:600}
+.tree{height:300px;border:1px solid #dadce0;border-radius:6px;overflow:hidden;position:relative}
+.tree-inner{position:absolute;left:0;right:0;top:0}
+.tree-row{height:26px;display:flex;align-items:center;gap:6px;white-space:nowrap;color:#3c4043}
+.tree-row .tw{width:10px;color:#80868b;font-size:11px}
+.tree-row .fd{width:13px;height:10px;border:1.5px solid #80868b;border-radius:2px;display:inline-block}
+.tree-row.hot{background:#e8f0fe}
+.cursor{position:absolute;left:0;top:0;width:18px;height:26px;display:none;pointer-events:none}
+.result{position:absolute;bottom:22px;left:22px;right:22px;font-size:13px;font-weight:600;color:#fff;background:#188038;border-radius:8px;padding:10px 12px;opacity:0}
+.key{position:absolute;left:0;right:0;top:1500px;display:flex;justify-content:center;opacity:0}
+.key kbd{font:700 64px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;border:2px solid #c6d5ea;border-bottom-width:8px;padding:18px 40px;border-radius:22px;color:#173b66;box-shadow:0 10px 30px rgba(20,50,100,.15)}
+.outro{position:absolute;left:0;right:0;top:600px;text-align:center;opacity:0}
+.outro img{width:230px;height:230px}
+.outro h2{font-size:120px;margin:20px 0 0;letter-spacing:-4px;color:#132a47}
+.outro p{font-size:46px;margin:18px 0 0;color:#3e5a7d;font-weight:600}
+.outro .store{display:inline-block;margin-top:60px;font-size:46px;font-weight:700;color:#fff;background:#1a73e8;border-radius:60px;padding:26px 56px}
+.outro small{display:block;margin-top:34px;font-size:32px;color:#5a7393}
+.controls{position:fixed;left:8px;top:8px;font:13px sans-serif;background:#fff;padding:6px 10px;border-radius:6px;box-shadow:0 2px 8px rgba(0,0,0,.15)}
+.capture .controls{display:none}
+</style>
+</head>
+<body>
+<main class="canvas" id="canvas">
+  <div class="brand"><img src="/public/icons/icon128.png" alt="">Marky</div>
+  <div class="caption" id="caption"></div>
+  <section class="stage" id="stage">
+    <div class="browser">
+      <div class="tabs"><span class="dot"></span><span class="dot"></span><span class="dot"></span><div class="tab" id="tab-title"></div></div>
+      <div class="toolbar"><span>←</span><span>↻</span><div class="address"><span id="address"></span><span class="star" id="star">☆</span></div><div class="marky-action"><img id="action-icon" src="/public/icons/icon-outline32.png" alt=""><span class="badge" id="badge">✓</span></div><span>⋮</span></div>
+      <div class="article"><div class="label" id="article-label"></div><h2 id="article-title"></h2><p id="article-text"></p><div class="code" id="article-code"></div></div>
+      <div class="bubble" id="bubble">
+        <h3>Закладка добавлена</h3>
+        <div class="field"><label>Название</label><div class="box">React — Quick Start</div></div>
+        <div class="field"><label>Папка</label><div class="box"><span>Reading</span><span>▾</span></div></div>
+        <div class="buttons"><span>Изменить…</span><span class="primary">Готово</span></div>
+        <div class="menu" id="menu">
+          <div>Reading</div><div>Projects</div><div>Design</div><div>CSS</div><div>Research</div><hr>
+          <div>Панель закладок</div><div>Другие закладки</div><hr>
+          <div id="menu-other">Выбрать другую папку…</div>
+        </div>
+      </div>
+      <div class="dialog" id="dialog">
+        <h3>Выбрать папку</h3>
+        <div class="tree"><div class="tree-inner" id="tree"></div></div>
+      </div>
+      <div class="popup-frame" id="popup-a"><iframe title="Marky" data-scenario="returning"></iframe></div>
+      <div class="popup-frame" id="popup-b"><iframe title="Marky" data-scenario="returning"></iframe></div>
+      <div class="popup-frame" id="popup-c"><iframe title="Marky" data-scenario="saved"></iframe></div>
+      <div class="result" id="result"></div>
+      <svg class="cursor" id="cursor" viewBox="0 0 18 26"><path d="M1 1v20l5-5 4 9 3-1.5-4-8.5h7z" fill="#111" stroke="#fff" stroke-width="1.4" stroke-linejoin="round"/></svg>
+    </div>
+  </section>
+  <div class="key" id="key"><kbd id="key-label"></kbd></div>
+  <section class="outro" id="outro">
+    <img src="/public/icons/icon128.png" alt="">
+    <h2>Marky</h2>
+    <p>Удобные закладки</p>
+    <div class="store">Chrome Web Store</div>
+    <small>Работает с вашими закладками Chrome</small>
+  </section>
+</main>
+<div class="controls"><button id="play">▶ Play</button> <span id="clock"></span></div>
+<script>
+const pages = {
+  react: { tab:'React — Quick Start', address:'react.dev/learn', label:'PROJECT REFERENCE', title:'Keep useful ideas close at hand.', text:'A guide worth saving for your next project.', code:'function MyComponent() {<br>&nbsp; return &lt;UsefulIdea /&gt;;<br>}' },
+  design: { tab:'Design Systems Handbook', address:'designsystems.com/handbook', label:'HANDBOOK', title:'Building a design system.', text:'Principles, tokens and components for a growing team.', code:'--color-accent: #1a73e8;<br>--radius-md: 8px;' }
+};
+const treeRows = [
+  [0,'Панель закладок'],[1,'Работа'],[2,'Клиенты'],[2,'Отчёты'],[2,'Проекты'],[3,'Мобильное приложение'],[3,'Сайт компании'],[3,'Frontend'],[4,'Angular'],[4,'Vue'],[4,'Tooling'],[4,'Testing'],[1,'Учёба'],[2,'Курсы'],[2,'Статьи'],[2,'Книги'],[1,'Дом'],[2,'Рецепты'],[2,'Путешествия'],[1,'Reading'],[1,'Research'],[1,'Design'],[1,'CSS'],[1,'TypeScript'],[1,'React'],[0,'Другие закладки'],[1,'Разное']
+];
+document.getElementById('tree').innerHTML = treeRows.map(([depth,title]) => `<div class="tree-row" style="padding-left:${8+depth*16}px"><span class="tw">▾</span><span class="fd"></span>${title}</div>`).join('');
+
+const $ = id => document.getElementById(id);
+const clamp = (x,a=0,b=1) => Math.max(a,Math.min(b,x));
+const ease = x => { x = clamp(x); return x<.5 ? 2*x*x : 1-Math.pow(-2*x+2,2)/2; };
+const lerp = (a,b,x) => a+(b-a)*x;
+
+// Default timing for manual preview; render.mjs replaces it with measured voice durations.
+let timing = [['tree',6.6],['open',5.95],['filter',5.05],['create',5.92],['move',5.09],['outro',4.69]].map(([id,voice]) => ({id,voice}));
+let scenes = [], captions = {}, total = 0;
+function init(t, captionText) {
+  if (t) timing = t;
+  if (captionText) captions = captionText;
+  let start = 0; scenes = [];
+  for (const [i,s] of timing.entries()) {
+    const tail = i === timing.length-1 ? 1.6 : 0.45;
+    scenes.push({ ...s, start, voiceStart: start+0.15, end: start+0.15+s.voice+tail });
+    start = scenes.at(-1).end;
+  }
+  total = start;
+  return { scenes, total };
+}
+
+// Popup frames: each is the compiled Marky popup with demo bookmarks.
+const frames = [...document.querySelectorAll('.popup-frame iframe')];
+const ready = Promise.all(frames.map(frame => new Promise(resolve => {
+  frame.addEventListener('load', () => {
+    const wait = () => frame.contentDocument.querySelector('.filter-input') ? resolve() : setTimeout(wait, 30);
+    wait();
+  }, { once:true });
+  frame.src = '/demo-popup?lang=ru&scenario=' + frame.dataset.scenario;
+})));
+const popupDoc = id => $(id).querySelector('iframe');
+function typeInto(id, value) {
+  const frame = popupDoc(id), win = frame.contentWindow, input = frame.contentDocument.querySelector('.filter-input');
+  Object.getOwnPropertyDescriptor(win.HTMLInputElement.prototype,'value').set.call(input, value);
+  input.dispatchEvent(new win.Event('input', { bubbles:true }));
+}
+function press(id, key) {
+  const frame = popupDoc(id), win = frame.contentWindow, input = frame.contentDocument.querySelector('.filter-input');
+  input.dispatchEvent(new win.KeyboardEvent('keydown', { key, bubbles:true, cancelable:true }));
+}
+
+// Scene scripts. Times are seconds from the scene start; `v` is the voice duration.
+const at = (s, local) => s.start + local;
+function sceneActions(s) {
+  const v = s.voice;
+  if (s.id === 'filter') return [[0.5,()=>typeInto('popup-a','r')],[0.7,()=>typeInto('popup-a','re')],[0.9,()=>typeInto('popup-a','rea')],[v*.62,()=>press('popup-a','Enter')]];
+  if (s.id === 'create') { const word='Design systems', t0=v*.42; return [...[...word].map((_,i)=>[t0+i*.06,()=>typeInto('popup-b',word.slice(0,i+1))]), [v*.78,()=>press('popup-b','Enter')]]; }
+  if (s.id === 'move') { const word='type', t0=v*.45; return [...[...word].map((_,i)=>[t0+i*.1,()=>typeInto('popup-c',word.slice(0,i+1))]), [v*.74,()=>press('popup-c','Enter')]]; }
+  return [];
+}
+let actions = [], fired = 0;
+function buildActions() { actions = scenes.flatMap(s => sceneActions(s).map(([local,fn]) => [at(s,local),fn])).sort((a,b)=>a[0]-b[0]); fired = 0; }
+
+function captionAt(t) {
+  const s = scenes.find(x => t < x.end) || scenes.at(-1);
+  const text = captions[s.id] || '';
+  const parts = text.match(/[^.?!…]+[.?!…»]*\s*/g)?.map(x=>x.trim()).filter(Boolean) || [text];
+  const weights = parts.map(p => p.length), sum = weights.reduce((a,b)=>a+b,0);
+  const progress = clamp((t - s.voiceStart) / s.voice) * sum;
+  let acc = 0;
+  for (const [i,p] of parts.entries()) { acc += weights[i]; if (progress < acc || i === parts.length-1) return p; }
+}
+
+function showPopup(id, open, close, t) {
+  const el = $(id), frame = el.querySelector('iframe');
+  const visible = t >= open && t < close;
+  const p = visible ? ease((t-open)/.18) : 0;
+  el.style.opacity = p;
+  el.style.transform = `scale(${lerp(.94,1,p)})`;
+  if (visible) { const h = frame.contentDocument.getElementById('root')?.offsetHeight || 320; frame.style.height = h+'px'; }
+}
+function showKey(label, t0, t) {
+  const p = t - t0;
+  if (p < 0 || p > 1.1) return false;
+  $('key-label').textContent = label;
+  $('key').style.opacity = p < .12 ? p/.12 : p > .9 ? (1.1-p)/.2 : 1;
+  $('key').style.transform = `scale(${p < .12 ? lerp(.8,1,p/.12) : 1})`;
+  return true;
+}
+function setPage(name) {
+  const page = pages[name];
+  $('tab-title').textContent = page.tab; $('address').textContent = page.address;
+  $('article-label').textContent = page.label; $('article-title').textContent = page.title;
+  $('article-text').textContent = page.text; $('article-code').innerHTML = page.code;
+}
+function setCursor(x, y, visible = true) {
+  $('cursor').style.display = visible ? 'block' : 'none';
+  $('cursor').style.transform = `translate(${x}px,${y}px)`;
+}
+
+function seek(t) {
+  while (fired < actions.length && actions[fired][0] <= t) actions[fired++][1]();
+  const caption = captionAt(t);
+  if ($('caption').dataset.text !== caption) { $('caption').dataset.text = caption; $('caption').textContent = caption; }
+  const S = Object.fromEntries(scenes.map(s => [s.id, s]));
+  const local = id => t - S[id].start;
+  const cur = scenes.find(x => t < x.end) || scenes.at(-1);
+
+  // Defaults, overridden per scene below.
+  let key = false, star = false, badge = false, result = '', icon = 'icon-outline32';
+  setCursor(0,0,false);
+  $('bubble').style.opacity = 0; $('menu').style.display = 'none'; $('dialog').style.opacity = 0;
+  $('stage').style.opacity = 1; $('outro').style.opacity = 0;
+
+  // Scene 1: Chrome's built-in flow, illustrated.
+  if (cur.id === 'tree') {
+    setPage('react');
+    const l = local('tree'), v = cur.voice;
+    const dialogAt = v*.5;
+    star = l > .45;
+    if (l < .45) setCursor(lerp(300,404,ease(l/.4)), lerp(260,68,ease(l/.4)));
+    const bubble = l >= .45 && l < dialogAt;
+    $('bubble').style.opacity = bubble ? ease((l-.45)/.15) : 0;
+    if (bubble) {
+      const menuAt = v*.18, hotAt = v*.36;
+      if (l < menuAt) setCursor(lerp(404,330,ease((l-.45)/(menuAt-.45))), lerp(68,182,ease((l-.45)/(menuAt-.45))));
+      else { $('menu').style.display = 'block'; setCursor(lerp(330,300,ease((l-menuAt)/(hotAt-menuAt))), lerp(182,382,ease((l-menuAt)/(hotAt-menuAt)))); }
+      $('menu-other').className = l > hotAt ? 'hot' : '';
+    }
+    if (l >= dialogAt) {
+      $('dialog').style.opacity = ease((l-dialogAt)/.2);
+      const scroll = ease((l-dialogAt-.2)/(cur.end-cur.start-dialogAt-.5));
+      const offset = scroll * (treeRows.length*26 - 300);
+      $('tree').style.transform = `translateY(${-offset}px)`;
+      const hover = Math.floor((offset + 150 + Math.sin(l*5)*40) / 26);
+      [...$('tree').children].forEach((row,i) => row.classList.toggle('hot', i === hover));
+      setCursor(250 + Math.sin(l*2.3)*60, 230 + Math.sin(l*5)*40);
+    }
+  }
+  // Scenes 2–3: open Marky, filter and save.
+  if (cur.id === 'open' || cur.id === 'filter') {
+    setPage('react');
+    const keyAt = S.open.voice*.4 + S.open.start + .15, openAt = keyAt + .25;
+    const enterAt = S.filter.start + S.filter.voice*.62;
+    key = showKey('⌘B', keyAt, t) || showKey('Enter', enterAt - .1, t);
+    showPopup('popup-a', openAt, enterAt + .2, t);
+    star = t > enterAt + .2; icon = star ? 'icon32' : icon;
+    badge = t > enterAt + .25 && t < enterAt + 1.5;
+    if (t > enterAt + .25) result = '✓ Сохранено в React';
+  } else showPopup('popup-a', 1, 0, t);
+  // Scene 4: no match, create a folder.
+  if (cur.id === 'create') {
+    setPage('design');
+    const l = local('create'), v = cur.voice, enterAt = v*.78;
+    key = showKey('⌘B', .1, l) || showKey('Enter', enterAt - .1, l);
+    showPopup('popup-b', .35, enterAt + .2, l);
+    star = l > enterAt + .2; icon = star ? 'icon32' : icon;
+    badge = l > enterAt + .25 && l < enterAt + 1.5;
+    if (l > enterAt + .25) result = '✓ Папка «Design systems» создана';
+  } else showPopup('popup-b', 1, 0, t);
+  // Scene 5: already saved, move to another folder.
+  if (cur.id === 'move') {
+    setPage('react');
+    const l = local('move'), v = cur.voice, enterAt = v*.74;
+    star = true; icon = 'icon32';
+    key = showKey('⌘B', .1, l) || showKey('Enter', enterAt - .1, l);
+    showPopup('popup-c', .35, enterAt + .2, l);
+    badge = l > enterAt + .25 && l < enterAt + 1.5;
+    if (l > enterAt + .25) result = '✓ Перенесено в TypeScript';
+  } else showPopup('popup-c', 1, 0, t);
+  // Scene 6: outro card.
+  if (cur.id === 'outro') {
+    setPage('react'); star = true; icon = 'icon32';
+    const p = ease(local('outro')/.45);
+    $('stage').style.opacity = 1-p;
+    $('outro').style.opacity = p;
+    $('outro').style.transform = `translateY(${lerp(30,0,p)}px)`;
+  }
+
+  if (!key) $('key').style.opacity = 0;
+  $('star').textContent = star ? '★' : '☆'; $('star').classList.toggle('on', star);
+  $('action-icon').src = `/public/icons/${icon}.png`;
+  $('badge').style.display = badge ? 'block' : 'none';
+  $('result').textContent = result; $('result').style.opacity = result ? 1 : 0;
+  $('clock').textContent = t.toFixed(2) + ' / ' + total.toFixed(2);
+}
+
+window.reel = { ready, init: (t, c) => { const r = init(t, c); buildActions(); return r; }, seek };
+if (new URLSearchParams(location.search).has('capture')) document.body.classList.add('capture');
+else {
+  // Manual preview: captions come from the script file, timing from estimates.
+  fetch('/marketing/reels/script-ru.json').then(r=>r.json()).then(async script => {
+    window.reel.init(null, Object.fromEntries(script.scenes.map(s=>[s.id,s.caption])));
+    await ready; seek(0);
+    $('play').onclick = () => location.search.includes('played') ? location.reload() : (()=>{const t0=performance.now();const tick=()=>{const t=(performance.now()-t0)/1000;seek(Math.min(t,total));if(t<total)requestAnimationFrame(tick);};tick();})();
+  });
+}
+</script>
+</body>
+</html>

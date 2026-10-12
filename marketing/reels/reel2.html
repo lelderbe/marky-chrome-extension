@@ -1,0 +1,622 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=1080">
+<title>Marky — Reels v2</title>
+<style>
+*{box-sizing:border-box}
+html,body{margin:0;background:#05080f}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;color:#fff}
+.canvas{width:1080px;height:1920px;position:relative;overflow:hidden;background:#070b14}
+.glow{position:absolute;border-radius:50%;filter:blur(90px);pointer-events:none}
+.glow.a{width:900px;height:700px;left:90px;top:-260px;background:rgba(40,110,240,.45)}
+.glow.b{width:700px;height:600px;left:-260px;top:1300px;background:rgba(20,150,140,.22)}
+.glow.c{width:600px;height:600px;left:640px;top:900px;background:rgba(60,90,220,.18)}
+/* Camera: the illustrated browser lives in .stage and is panned/zoomed per scene. */
+.stage{position:absolute;left:0;top:0;width:520px;height:500px;transform-origin:0 0}
+.fade{position:absolute;left:0;right:0;top:0;height:560px;background:linear-gradient(180deg,#070b14 0%,#070b14 62%,rgba(7,11,20,0) 100%);pointer-events:none}
+.fade.bottom{top:auto;bottom:0;height:340px;background:linear-gradient(0deg,#070b14 0%,#070b14 30%,rgba(7,11,20,0) 100%)}
+.caption{position:absolute;top:210px;left:60px;right:60px;height:300px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;font-weight:800;letter-spacing:-1.5px;line-height:1.12}
+.caption .l1{font-size:70px;color:#fff}
+.caption .l2{font-size:70px;color:#7cb2ff;text-shadow:0 0 40px rgba(80,150,255,.45)}
+.caption .w{display:inline-block;white-space:pre}
+.browser{position:absolute;inset:0;background:#17181b;border:1px solid #3a3d44;border-radius:12px;overflow:hidden;box-shadow:0 0 0 1px rgba(255,255,255,.03),0 20px 60px rgba(0,0,0,.6)}
+.tabs{height:40px;background:#202124;padding:0 14px;display:flex;gap:7px;align-items:center}
+.dot{width:8px;height:8px;border-radius:50%;background:#4a4d55}
+.tab{font-size:11px;background:#35363a;color:#e8eaed;padding:9px 14px;margin-left:14px;border-radius:7px 7px 0 0;min-width:190px;align-self:flex-end}
+.toolbar{height:48px;padding:8px 12px;background:#35363a;display:flex;gap:11px;align-items:center;color:#9aa0a6;font-size:13px}
+.address{background:#202124;flex:1;border-radius:16px;font-size:11px;padding:8px 12px;display:flex;align-items:center;justify-content:space-between;color:#bdc1c6}
+.star{font-size:17px;line-height:1;color:#9aa0a6}
+.star.on{color:#8ab4f8}
+.marky-action{position:relative;width:30px;height:30px;border-radius:50%;background:#2b3a55;display:flex;align-items:center;justify-content:center}
+.marky-action img{width:19px;height:19px}
+.badge{position:absolute;right:-6px;bottom:-5px;background:#1e8e3e;color:#fff;font-size:9px;font-weight:700;border-radius:7px;padding:1px 4px;display:none}
+.article{padding:26px 22px;width:230px}
+.article .label{font-size:9px;color:#8ab4f8;font-weight:700;letter-spacing:1.2px}
+.article h2{font-size:21px;line-height:1.2;margin:12px 0;color:#e8eaed;letter-spacing:-.4px}
+.article p{font-size:11px;line-height:1.7;margin:10px 0;color:#9aa0a6}
+.code{font:10px/1.8 ui-monospace,Menlo,monospace;background:#202124;border:1px solid #2f3137;border-radius:6px;padding:10px;margin-top:16px;color:#8ab4f8}
+.popup-frame{position:absolute;right:10px;top:92px;width:282px;border:1px solid #4a4d55;background:#292a2d;border-radius:8px;overflow:hidden;box-shadow:0 0 0 1px rgba(124,178,255,.25),0 14px 40px rgba(0,0,0,.6),0 0 60px rgba(60,130,255,.25);transform-origin:top right;opacity:0}
+.popup-frame iframe{display:block;border:0;width:280px;height:320px;background:#292a2d}
+/* Illustration of Chrome's built-in bookmark bubble and folder dialog (dark theme). */
+.bubble{position:absolute;right:52px;top:86px;width:290px;background:#2d2e31;border-radius:10px;box-shadow:0 10px 30px rgba(0,0,0,.5);padding:16px;font-size:12px;color:#e8eaed;opacity:0}
+.bubble h3{margin:0 0 14px;font-size:14px;font-weight:600}
+.field{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.field label{width:62px;color:#9aa0a6}
+.field .box{flex:1;border:1px solid #5f6368;border-radius:5px;padding:7px 9px;display:flex;justify-content:space-between}
+.buttons{display:flex;justify-content:flex-end;gap:8px;margin-top:14px}
+.buttons span{padding:6px 12px;border-radius:14px;border:1px solid #5f6368;color:#8ab4f8}
+.buttons span.primary{background:#8ab4f8;color:#202124;border-color:#8ab4f8}
+.menu{position:absolute;left:88px;top:122px;width:186px;background:#3c3d41;border-radius:6px;box-shadow:0 8px 24px rgba(0,0,0,.5);padding:4px 0;display:none}
+.menu div{padding:5px 12px}
+.menu hr{border:0;border-top:1px solid #5f6368;margin:4px 0}
+.hot{background:rgba(138,180,248,.22)}
+.dialog{position:absolute;left:40px;top:70px;width:440px;height:400px;background:#2d2e31;border-radius:10px;box-shadow:0 14px 44px rgba(0,0,0,.6);padding:16px;font-size:12px;color:#e8eaed;opacity:0}
+.dialog h3{margin:0 0 12px;font-size:14px;font-weight:600}
+.tree{height:290px;border:1px solid #5f6368;border-radius:6px;overflow:hidden;padding:4px 0}
+.tree-row{height:24px;display:flex;align-items:center;gap:6px;white-space:nowrap;color:#e8eaed}
+.tree-row .tw{width:10px;color:#9aa0a6;font-size:10px;text-align:center}
+.tree-row .fd{width:13px;height:10px;border:1.5px solid #9aa0a6;border-radius:2px;display:inline-block}
+.tree-row.sel{background:#8ab4f8;color:#202124}
+.tree-row.sel .fd{border-color:#202124}
+.dialog .buttons{margin-top:12px}
+.cursor{position:absolute;left:0;top:0;width:18px;height:26px;display:none;pointer-events:none}
+.ripple{position:absolute;left:0;top:0;width:30px;height:30px;margin:-15px 0 0 -15px;border-radius:50%;border:2px solid #7cb2ff;opacity:0;pointer-events:none}
+.recent{position:absolute;border:2px solid #7cb2ff;border-radius:6px;box-shadow:0 0 22px rgba(124,178,255,.6),inset 0 0 18px rgba(124,178,255,.15);opacity:0;pointer-events:none}
+.result{position:absolute;bottom:22px;left:22px;right:22px;font-size:13px;font-weight:600;color:#fff;background:#1e8e3e;border-radius:8px;padding:10px 12px;opacity:0;box-shadow:0 0 30px rgba(30,142,62,.5)}
+/* Counters under the stage. */
+.counter{position:absolute;left:0;right:0;top:1540px;display:flex;justify-content:center;opacity:0}
+.counter span{font:800 54px -apple-system,BlinkMacSystemFont,sans-serif;color:#fff;background:rgba(255,120,90,.14);border:2px solid rgba(255,140,110,.55);border-radius:40px;padding:14px 36px;letter-spacing:-1px}
+.counter b{color:#ff9b7d}
+.keys{position:absolute;left:40px;right:40px;top:1540px;display:flex;justify-content:center;align-items:center;gap:18px}
+.keys kbd{font:700 50px -apple-system,BlinkMacSystemFont,sans-serif;background:rgba(124,178,255,.12);border:2px solid rgba(124,178,255,.55);border-bottom-width:6px;padding:12px 28px;border-radius:20px;color:#fff;box-shadow:0 0 30px rgba(80,150,255,.25)}
+.outro{position:absolute;left:0;right:0;top:560px;text-align:center;opacity:0}
+.outro img{width:250px;height:250px;filter:drop-shadow(0 0 60px rgba(80,150,255,.7))}
+.outro h2{font-size:130px;margin:16px 0 0;letter-spacing:-5px;font-weight:800}
+.outro .store{display:inline-block;margin-top:56px;font-size:46px;font-weight:700;color:#fff;background:#1a73e8;border-radius:60px;padding:26px 56px;box-shadow:0 0 60px rgba(26,115,232,.6)}
+.outro small{display:block;margin-top:40px;font-size:36px;color:#9fb6d8}
+.compare{position:absolute;left:0;right:0;top:720px;display:flex;flex-direction:column;align-items:center;gap:70px;opacity:0}
+.compare .old{position:relative;font:800 72px -apple-system,BlinkMacSystemFont,sans-serif;color:#fff;background:rgba(255,120,90,.14);border:2px solid rgba(255,140,110,.55);border-radius:50px;padding:18px 48px;letter-spacing:-1px}
+.compare .old b{color:#ff9b7d}
+.compare .strike{position:absolute;left:6%;top:50%;height:7px;margin-top:-3px;width:0;background:#ff9b7d;border-radius:4px;box-shadow:0 0 18px rgba(255,140,110,.7)}
+.compare .new{display:flex;gap:22px}
+.compare kbd{font:700 64px -apple-system,BlinkMacSystemFont,sans-serif;background:rgba(124,178,255,.12);border:2px solid rgba(124,178,255,.55);border-bottom-width:7px;padding:16px 34px;border-radius:24px;color:#fff;box-shadow:0 0 40px rgba(80,150,255,.35)}
+.sparkle{position:absolute;width:6px;height:6px;border-radius:50%;background:#cfe0ff;box-shadow:0 0 12px #9cc2ff}
+.controls{position:fixed;left:8px;top:8px;font:13px sans-serif;background:#fff;color:#000;padding:6px 10px;border-radius:6px}
+.capture .controls{display:none}
+
+/* Light theme (?theme=light): same scene, airy palette. The popup follows prefers-color-scheme: light. */
+.light,.light body{background:#eef3fb}
+.light body{color:#132a47}
+.light .canvas{background:linear-gradient(180deg,#f7faff 0%,#eef4fd 55%,#e6eefb 100%)}
+.light .glow.a{background:rgba(120,170,255,.35)}
+.light .glow.b{background:rgba(110,215,190,.28)}
+.light .glow.c{background:rgba(255,190,150,.22)}
+.light .fade{background:linear-gradient(180deg,#f7faff 0%,#f6f9ff 62%,rgba(246,249,255,0) 100%)}
+.light .fade.bottom{background:linear-gradient(0deg,#e6eefb 0%,#e6eefb 30%,rgba(230,238,251,0) 100%)}
+.light .caption .l1{color:#132a47}
+.light .caption .l2{color:#1a73e8;text-shadow:none}
+.light .browser{background:#fff;border-color:#d3dcea;box-shadow:0 18px 50px rgba(40,80,150,.18)}
+.light .tabs{background:#e3eaf5}
+.light .dot{background:#b8c7da}
+.light .tab{background:#fff;color:#202124}
+.light .toolbar{background:#fff;color:#5f6368;border-bottom:1px solid #e3e8f0}
+.light .address{background:#f1f3f6;color:#3c4043}
+.light .star{color:#5f6368}
+.light .star.on{color:#1a73e8}
+.light .marky-action{background:#e8f0fe}
+.light .article .label{color:#1a73e8}
+.light .article h2{color:#202124}
+.light .article p{color:#5f6368}
+.light .code{background:#f6f8fb;border-color:#e3e8f0;color:#3367d6}
+.light .popup-frame{background:#fff;border-color:#d0d7e2;box-shadow:0 0 0 1px rgba(26,115,232,.15),0 16px 40px rgba(40,80,150,.22)}
+.light .popup-frame iframe{background:#fff}
+.light .bubble,.light .dialog{background:#fff;color:#202124;box-shadow:0 12px 36px rgba(40,80,150,.25)}
+.light .field label{color:#5f6368}
+.light .field .box,.light .tree{border-color:#c7ccd3}
+.light .buttons span{border-color:#c7ccd3;color:#1a73e8}
+.light .buttons span.primary{background:#1a73e8;color:#fff;border-color:#1a73e8}
+.light .menu{background:#fff;box-shadow:0 8px 24px rgba(40,80,150,.25)}
+.light .menu hr{border-top-color:#e3e6ea}
+.light .hot{background:#e8f0fe}
+.light .tree-row{color:#202124}
+.light .tree-row .tw{color:#80868b}
+.light .tree-row .fd{border-color:#80868b}
+.light .tree-row.sel{background:#1a73e8;color:#fff}
+.light .tree-row.sel .fd{border-color:#fff}
+.light .cursor path{fill:#111;stroke:#fff}
+.light .ripple{border-color:#1a73e8}
+.light .recent{border-color:#1a73e8;box-shadow:0 0 18px rgba(26,115,232,.35),inset 0 0 14px rgba(26,115,232,.08)}
+.light .result{box-shadow:0 8px 24px rgba(30,142,62,.3)}
+.light .counter span,.light .compare .old{color:#132a47;background:#fff;border-color:#ffb49c;box-shadow:0 10px 30px rgba(232,96,60,.15)}
+.light .counter b,.light .compare .old b{color:#e8603c}
+.light .compare .strike{background:#e8603c;box-shadow:none}
+.light .keys kbd,.light .compare kbd{color:#173b66;background:#fff;border-color:#b9cdea;box-shadow:0 10px 26px rgba(40,90,170,.15)}
+.light .outro img{filter:drop-shadow(0 16px 40px rgba(26,115,232,.35))}
+.light .outro h2{color:#132a47}
+.light .outro .store{box-shadow:0 14px 36px rgba(26,115,232,.35)}
+.light .outro small{color:#5a7393}
+.light .sparkle{background:#8ab4f8;box-shadow:0 0 10px rgba(26,115,232,.5)}
+
+/* Colour themes (?theme=color|teal|warm): a saturated gradient, white type, light UI on top.
+   Each palette only sets the variables below; the rules are shared. */
+.color{--top:#3f5efb;--mid1:#5b5cff;--mid2:#9a5cf2;--bottom:#f0708f;--glow-a:rgba(120,220,255,.45);--glow-b:rgba(255,214,107,.35);--glow-c:rgba(255,120,170,.35);--accent:#ffd66b;--brand:#3f5efb;--shade:30,20,110;--chip-edge:#c9c3ff}
+.color.teal{--top:#0b8fa3;--mid1:#0fa8a0;--mid2:#3cbf8c;--bottom:#9bd66f;--glow-a:rgba(140,235,255,.4);--glow-b:rgba(255,236,140,.4);--glow-c:rgba(255,255,255,.3);--accent:#ffe680;--brand:#0b8fa3;--shade:5,60,70;--chip-edge:#a8e6dc}
+.color.warm{--top:#ff8a4c;--mid1:#ff6b6b;--mid2:#f2558f;--bottom:#a24fd6;--glow-a:rgba(255,220,120,.45);--glow-b:rgba(255,140,200,.35);--glow-c:rgba(140,120,255,.3);--accent:#fff1a8;--brand:#e8505b;--shade:110,30,60;--chip-edge:#ffc9b8}
+.color,.color body{background:var(--top)}
+.color .canvas{background:linear-gradient(180deg,var(--top) 0%,var(--mid1) 38%,var(--mid2) 68%,var(--bottom) 100%)}
+.color .glow.a{background:var(--glow-a)}
+.color .glow.b{background:var(--glow-b)}
+.color .glow.c{background:var(--glow-c)}
+.color .fade{background:linear-gradient(180deg,var(--top) 0%,var(--top) 55%,transparent 100%)}
+.color .fade.bottom{background:linear-gradient(0deg,var(--bottom) 0%,var(--bottom) 25%,transparent 100%)}
+.color .caption .l1{color:#fff;text-shadow:0 4px 24px rgba(var(--shade),.25)}
+.color .caption .l2{color:var(--accent);text-shadow:0 4px 24px rgba(var(--shade),.3)}
+.color .browser{background:#fff;border-color:rgba(255,255,255,.6);box-shadow:0 24px 60px rgba(var(--shade),.35)}
+.color .tabs{background:#e3eaf5}
+.color .dot{background:#b8c7da}
+.color .tab{background:#fff;color:#202124}
+.color .toolbar{background:#fff;color:#5f6368;border-bottom:1px solid #e3e8f0}
+.color .address{background:#f1f3f6;color:#3c4043}
+.color .star{color:#5f6368}
+.color .star.on{color:#1a73e8}
+.color .marky-action{background:#e8f0fe}
+.color .article .label{color:#1a73e8}
+.color .article h2{color:#202124}
+.color .article p{color:#5f6368}
+.color .code{background:#f6f8fb;border-color:#e3e8f0;color:#3367d6}
+.color .popup-frame{background:#fff;border-color:#d0d7e2;box-shadow:0 0 0 1px rgba(26,115,232,.15),0 18px 44px rgba(var(--shade),.3)}
+.color .popup-frame iframe{background:#fff}
+.color .bubble,.color .dialog{background:#fff;color:#202124;box-shadow:0 14px 40px rgba(var(--shade),.3)}
+.color .field label{color:#5f6368}
+.color .field .box,.color .tree{border-color:#c7ccd3}
+.color .buttons span{border-color:#c7ccd3;color:#1a73e8}
+.color .buttons span.primary{background:#1a73e8;color:#fff;border-color:#1a73e8}
+.color .menu{background:#fff;box-shadow:0 8px 24px rgba(var(--shade),.25)}
+.color .menu hr{border-top-color:#e3e6ea}
+.color .hot{background:#e8f0fe}
+.color .tree-row{color:#202124}
+.color .tree-row .tw{color:#80868b}
+.color .tree-row .fd{border-color:#80868b}
+.color .tree-row.sel{background:#1a73e8;color:#fff}
+.color .tree-row.sel .fd{border-color:#fff}
+.color .cursor path{fill:#111;stroke:#fff}
+.color .ripple{border-color:#1a73e8}
+.color .recent{border-color:#1a73e8;box-shadow:0 0 18px rgba(26,115,232,.35),inset 0 0 14px rgba(26,115,232,.08)}
+.color .counter span,.color .compare .old{color:#132a47;background:#fff;border-color:#fff;box-shadow:0 14px 36px rgba(var(--shade),.3)}
+.color .counter b,.color .compare .old b{color:#e8603c}
+.color .compare .strike{background:#e8603c;box-shadow:none}
+.color .keys kbd,.color .compare kbd{color:#1f2a44;background:#fff;border-color:#fff;border-bottom-color:var(--chip-edge);box-shadow:0 12px 30px rgba(var(--shade),.3)}
+.color .outro img{background:#fff;border-radius:56px;padding:34px;filter:drop-shadow(0 20px 40px rgba(var(--shade),.35))}
+.color .outro h2{color:#fff;text-shadow:0 6px 30px rgba(var(--shade),.3)}
+.color .outro .store{background:#fff;color:var(--brand);box-shadow:0 16px 40px rgba(var(--shade),.35)}
+.color .outro small{color:rgba(255,255,255,.88)}
+.color .sparkle{background:#fff;box-shadow:0 0 12px rgba(255,255,255,.9)}
+</style>
+</head>
+<body>
+<main class="canvas" id="canvas">
+  <div class="glow a"></div><div class="glow b"></div><div class="glow c"></div>
+  <section class="stage" id="stage">
+    <div class="browser">
+      <div class="tabs"><span class="dot"></span><span class="dot"></span><span class="dot"></span><div class="tab" id="tab-title"></div></div>
+      <div class="toolbar"><span>←</span><span>↻</span><div class="address"><span id="address"></span><span class="star" id="star">☆</span></div><div class="marky-action"><img id="action-icon" src="/public/icons/icon-outline32.png" alt=""><span class="badge" id="badge">✓</span></div><span>⋮</span></div>
+      <div class="article"><div class="label" id="article-label"></div><h2 id="article-title"></h2><p id="article-text"></p><div class="code" id="article-code"></div></div>
+      <div class="bubble" id="bubble">
+        <h3>Закладка добавлена</h3>
+        <div class="field"><label>Название</label><div class="box">React — Quick Start</div></div>
+        <div class="field"><label>Папка</label><div class="box" id="folder-select"><span>Reading</span><span>▾</span></div></div>
+        <div class="buttons"><span>Изменить…</span><span class="primary">Готово</span></div>
+        <div class="menu" id="menu">
+          <div>Reading</div><div>Projects</div><div>Design</div><div>CSS</div><div>Research</div><hr>
+          <div>Панель закладок</div><div>Другие закладки</div><hr>
+          <div id="menu-other">Выбрать другую папку…</div>
+        </div>
+      </div>
+      <div class="dialog" id="dialog">
+        <h3>Выбрать папку</h3>
+        <div class="tree" id="tree"></div>
+        <div class="buttons"><span>Отмена</span><span class="primary" id="dialog-save">Сохранить</span></div>
+      </div>
+      <div class="popup-frame" id="popup-a"><iframe title="Marky" data-scenario="returning"></iframe></div>
+      <div class="popup-frame" id="popup-b"><iframe title="Marky" data-scenario="returning"></iframe></div>
+      <div class="popup-frame" id="popup-c"><iframe title="Marky" data-scenario="saved"></iframe></div>
+      <div class="recent" id="recent"></div>
+      <div class="result" id="result"></div>
+      <div class="ripple" id="ripple"></div>
+      <svg class="cursor" id="cursor" viewBox="0 0 18 26"><path d="M1 1v20l5-5 4 9 3-1.5-4-8.5h7z" fill="#fff" stroke="#111" stroke-width="1.4" stroke-linejoin="round"/></svg>
+    </div>
+  </section>
+  <div class="fade"></div><div class="fade bottom"></div>
+  <div class="caption" id="caption"><div class="l1" id="l1"></div><div class="l2" id="l2"></div></div>
+  <div class="counter" id="counter"><span>кликов: <b id="count">0</b></span></div>
+  <div class="keys" id="keys"></div>
+  <section class="outro" id="outro">
+    <img src="/public/icons/icon128.png" alt="">
+    <h2>Marky</h2>
+    <div class="store">Chrome Web Store</div>
+    <small>Сохраните, чтобы не потерять →</small>
+  </section>
+  <section class="compare" id="compare">
+    <div class="old">поиск по дереву<span class="strike" id="strike"></span></div>
+    <div class="new" id="compare-keys"><kbd>клик</kbd><kbd>клик</kbd></div>
+  </section>
+  <div id="sparkles"></div>
+</main>
+<div class="controls"><button id="play">▶ Play</button> <span id="clock"></span></div>
+<script>
+const $ = id => document.getElementById(id);
+const clamp = (x,a=0,b=1) => Math.max(a,Math.min(b,x));
+const ease = x => { x = clamp(x); return x<.5 ? 4*x*x*x : 1-Math.pow(-2*x+2,3)/2; };
+const back = x => { x = clamp(x); const c=1.7; return 1+(c+1)*Math.pow(x-1,3)+c*Math.pow(x-1,2); };
+const lerp = (a,b,x) => a+(b-a)*x;
+
+const pages = {
+  react: { tab:'React — Quick Start', address:'react.dev/learn', label:'PROJECT REFERENCE', title:'Keep useful ideas close at hand.', text:'A guide worth saving for your next project.', code:'function MyComponent() {<br>&nbsp; return &lt;UsefulIdea /&gt;;<br>}' },
+  design: { tab:'Design Systems Handbook', address:'designsystems.com/handbook', label:'HANDBOOK', title:'Building a design system.', text:'Principles, tokens and components for a growing team.', code:'--color-accent: #8ab4f8;<br>--radius-md: 8px;' }
+};
+function setPage(name) {
+  const p = pages[name];
+  if ($('address').textContent === p.address) return;
+  $('tab-title').textContent = p.tab; $('address').textContent = p.address;
+  $('article-label').textContent = p.label; $('article-title').textContent = p.title;
+  $('article-text').textContent = p.text; $('article-code').innerHTML = p.code;
+}
+
+// Folder tree of the illustrated Chrome dialog; `opens` lists rows expanded by clicks.
+const tree = [
+  ['bar',0,'Панель закладок'],['work',1,'Работа'],['clients',2,'Клиенты'],['reports',2,'Отчёты'],['projects',2,'Проекты'],['mobile',3,'Мобильное приложение'],['site',3,'Сайт компании'],['frontend',3,'Frontend'],['angular',4,'Angular'],['react',4,'React'],['vue',4,'Vue'],
+  ['study',1,'Учёба'],['home',1,'Дом'],['reading',1,'Reading'],['research',1,'Research'],['design',1,'Design'],['css',1,'CSS'],['other',0,'Другие закладки'],['mobilebm',0,'Мобильные закладки']
+];
+const parents = {work:'bar',clients:'work',reports:'work',projects:'work',mobile:'projects',site:'projects',frontend:'projects',angular:'frontend',react:'frontend',vue:'frontend',study:'bar',home:'bar',reading:'bar',research:'bar',design:'bar',css:'bar'};
+const branches = new Set(['bar','work','projects','frontend','study','home','other','mobilebm']);
+function renderTree(open, selected) {
+  const key = [...open].join()+'|'+selected;
+  if ($('tree').dataset.key === key) return;
+  $('tree').dataset.key = key;
+  const visible = ([id]) => { let p = parents[id]; while (p) { if (!open.has(p)) return false; p = parents[p]; } return true; };
+  $('tree').innerHTML = tree.filter(visible).map(([id,depth,title]) => `<div class="tree-row${id===selected?' sel':''}" data-id="${id}" style="padding-left:${8+depth*16}px"><span class="tw">${branches.has(id)?(open.has(id)?'▾':'▸'):''}</span><span class="fd"></span>${title}</div>`).join('');
+}
+
+let timing = [], scenes = [], total = 0, script = null;
+function init(t, s) {
+  script = s; timing = t;
+  let start = 0; scenes = [];
+  for (const [i,x] of timing.entries()) {
+    const def = script.scenes[i];
+    const voiceStart = start + .1, scene = { ...def, voice:x.voice, onsets:x.onsets || [], start, voiceStart };
+    beats[def.id] = sceneBeats(scene);
+    scene.end = Math.max(voiceStart + x.voice + .15, start + (def.min || 0), start + (beats[def.id].hold || 0)) + (def.pause || 0);
+    if (i === timing.length-1) scene.end += 1.4;
+    scenes.push(scene);
+    start = scene.end;
+  }
+  total = start;
+  buildActions();
+  return { scenes: scenes.map(({id,start,voiceStart,end,voice}) => ({id,start,voiceStart,end,voice})), total };
+}
+
+// Real Marky popups with demo bookmarks.
+const frames = [...document.querySelectorAll('.popup-frame iframe')];
+const ready = Promise.all(frames.map(frame => new Promise(resolve => {
+  frame.addEventListener('load', () => { const wait = () => frame.contentDocument.querySelector('.filter-input') ? resolve() : setTimeout(wait,30); wait(); }, { once:true });
+  frame.src = '/demo-popup?lang=ru&scenario=' + frame.dataset.scenario;
+})));
+const popupFrame = id => $(id).querySelector('iframe');
+function typeInto(id, value) {
+  const f = popupFrame(id), win = f.contentWindow, input = f.contentDocument.querySelector('.filter-input');
+  Object.getOwnPropertyDescriptor(win.HTMLInputElement.prototype,'value').set.call(input, value);
+  input.dispatchEvent(new win.Event('input', { bubbles:true }));
+}
+function folderButton(id, label) {
+  const doc = popupFrame(id).contentDocument;
+  if (label === 'new') return doc.querySelector('.folder-item--new');
+  return [...doc.querySelectorAll('.folder-item')].find(b => b.querySelector('.folder-title')?.textContent === label);
+}
+// Mouse over a folder row highlights it like a real pointer; click saves through the popup's own handler.
+function hoverFolder(id, label) { const b = folderButton(id, label); b?.dispatchEvent(new (popupFrame(id).contentWindow.MouseEvent)('mouseover', { bubbles:true })); }
+function clickFolder(id, label) { hoverFolder(id, label); folderButton(id, label)?.click(); }
+function press(id, key) {
+  const f = popupFrame(id), win = f.contentWindow, input = f.contentDocument.querySelector('.filter-input');
+  input.dispatchEvent(new win.KeyboardEvent('keydown', { key, bubbles:true, cancelable:true }));
+}
+
+// Per-scene beats in local seconds. Everything visual is derived from these numbers.
+const beats = {};
+// Local scene time of the word that starts nearest to `frac` of the line.
+// `onsets` are measured from the recording by render.mjs; without them the fraction is used as is.
+function cue(s, frac) {
+  const want = frac * s.voice, lead = s.voiceStart - s.start;
+  if (!s.onsets.length) return lead + want;
+  return lead + s.onsets.reduce((best, x) => Math.abs(x - want) < Math.abs(best - want) ? x : best, s.onsets[0]);
+}
+function sceneBeats(s) {
+  const at = frac => cue(s, frac);
+  // Clicks follow the line: «Клик» → star, «ещё клик» → list, «и ещё» → other folder, «и поиск по дереву» → tree.
+  if (s.id === 'tree') {
+    // After «Сохранить» the camera takes .9 s to settle on the wide shot; the next line starts .1 s later.
+    const work = at(.79), tree = ['work','projects','frontend','react','save'].map((id,i) => [id, work + i*.55]);
+    return { clicks:[['star',at(.37)],['select',at(.455)],['other',at(.62)], ...tree], hold: work + 4*.55 + 1.0 };
+  }
+  // Marky is driven by the mouse: «Клик по Марки» opens it, folders are clicked; typing only filters or names a folder.
+  if (s.id === 'open') { const click = at(0) + .12; return { iconClick:click, open:click+.1, recent:at(.72) }; }
+  if (s.id === 'filter') { const t0 = at(.3); return { typed:[['r',t0],['re',t0+.15],['rea',t0+.3]], typeAt:t0, click:at(.7)+.1, target:'React' }; }
+  if (s.id === 'create') return { iconClick:.3, open:.4, typeAt:at(.33), word:'Design systems', click:at(.64)+.1, target:'new' };
+  if (s.id === 'move') return { iconClick:.3, open:.4, arrive:at(.34)+.6, click:at(.71), target:'TypeScript' };
+  return {};
+}
+let actions = [], fired = 0;
+function buildActions() {
+  actions = [];
+  for (const s of scenes) {
+    const b = beats[s.id], at = x => s.start + x;
+    if (s.id === 'filter') {
+      b.typed.forEach(([v,t]) => actions.push([at(t),()=>typeInto('popup-a',v)]));
+      actions.push([at(b.click-.25),()=>hoverFolder('popup-a',b.target)],[at(b.click),()=>clickFolder('popup-a',b.target)]);
+    }
+    if (s.id === 'create') {
+      [...b.word].forEach((_,i) => actions.push([at(b.typeAt+i*.045),()=>typeInto('popup-b',b.word.slice(0,i+1))]));
+      actions.push([at(b.click),()=>clickFolder('popup-b','new')]);
+    }
+    if (s.id === 'move') actions.push([at(b.arrive),()=>hoverFolder('popup-c',b.target)],[at(b.click),()=>clickFolder('popup-c',b.target)]);
+  }
+  actions.sort((a,b)=>a[0]-b[0]); fired = 0;
+}
+
+// Camera presets in canvas pixels for the 520×500 browser.
+const CAM = {
+  wide:   { x:46,   y:600, s:1.9 },
+  bubble: { x:-333, y:330, s:2.7 },
+  dialog: { x:-32,  y:400, s:2.2 },
+  popup:  { x:-346, y:340, s:2.4 },
+  out:    { x:46,   y:640, s:1.9 }
+};
+function cameraAt(t) {
+  const keys = [[0,'wide',0]];
+  for (const s of scenes) {
+    const b = beats[s.id], at = x => s.start + x;
+    if (s.id === 'tree') { const c = Object.fromEntries(b.clicks); keys.push([at(c.star+.05),'bubble',.5],[at(c.other+.05),'dialog',.5],[at(c.save+.2),'wide',.7]); }
+    if (s.id === 'open') keys.push([at(b.open),'popup',.55]);
+    if (s.id === 'filter') keys.push([at(b.click+.15),'wide',.5]);
+    if (s.id === 'create' || s.id === 'move') keys.push([at(b.open),'popup',.5],[at(b.click+.15),'wide',.5]);
+    if (s.id === 'outro') keys.push([at(0),'out',.5]);
+  }
+  let cam = { ...CAM.wide };
+  for (const [time,name,d] of keys) {
+    if (t < time) break;
+    const p = d ? ease((t-time)/d) : 1, to = CAM[name];
+    cam = { x:lerp(cam.x,to.x,p), y:lerp(cam.y,to.y,p), s:lerp(cam.s,to.s,p) };
+  }
+  // Slow drift keeps static moments alive.
+  cam.s *= 1 + .012*Math.sin(t*.9);
+  return cam;
+}
+
+function captionAt(t) {
+  const s = scenes.find(x => t < x.end) || scenes.at(-1);
+  const items = s.text.map((item,i) => ({ ...item, from: s.start + (i ? cue(s, item.at) : 0) }));
+  let i = items.length-1; while (i > 0 && t < items[i].from) i--;
+  const item = items[i], until = items[i+1]?.from ?? s.voiceStart + s.voice;
+  return { key: s.id+i, lines: item.lines, kept: item.lines.map((line,li) => i > 0 && line && items[i-1].lines[li] === line), from: item.from, span: Math.max(.5, (until-item.from)*.7) };
+}
+function renderCaption(t) {
+  const c = captionAt(t);
+  if ($('caption').dataset.key !== c.key) {
+    $('caption').dataset.key = c.key;
+    // A line repeated from the previous item stays on screen instead of animating again.
+    ['l1','l2'].forEach((id,li) => $(id).innerHTML = (c.lines[li]||'').split(' ').filter(Boolean).map(w => `<span class="w${c.kept[li]?' kept':''}">${w} </span>`).join(''));
+  }
+  const words = [...$('caption').querySelectorAll('.w:not(.kept)')], step = c.span / Math.max(1, words.length);
+  $('caption').querySelectorAll('.kept').forEach(w => { w.style.opacity = 1; w.style.transform = 'none'; w.style.filter = 'none'; });
+  words.forEach((w,j) => {
+    const p = ease((t - c.from - j*step) / .25);
+    w.style.opacity = p; w.style.transform = `translateY(${lerp(28,0,p)}px)`; w.style.filter = `blur(${lerp(8,0,p)}px)`;
+  });
+}
+
+function showPopup(id, open, close, t) {
+  const el = $(id), frame = el.querySelector('iframe');
+  const vis = t >= open && t < close, p = vis ? back((t-open)/.3) : 0;
+  el.style.opacity = vis ? clamp((t-open)/.12) : 0;
+  el.style.transform = `scale(${vis ? lerp(.85,1,p) : .85})`;
+  if (vis) frame.style.height = (frame.contentDocument.getElementById('root')?.offsetHeight || 320) + 'px';
+}
+function setKeys(list, t) {
+  const html = list.map(([label,at],i) => `<kbd data-i="${i}">${label}</kbd>`).join('');
+  if ($('keys').dataset.html !== html) { $('keys').dataset.html = html; $('keys').innerHTML = html; }
+  [...$('keys').children].forEach((k,i) => {
+    const p = back((t - list[i][1]) / .3);
+    k.style.opacity = clamp((t - list[i][1]) / .1);
+    k.style.transform = `scale(${lerp(.5,1,p)})`;
+  });
+}
+
+// Cursor positions in browser coordinates, measured from the live DOM.
+const posCache = {};
+function targetEl(name) {
+  if (name === 'star') return $('star');
+  if (name === 'select') return $('folder-select');
+  if (name === 'other') return $('menu-other');
+  if (name === 'save') return $('dialog-save');
+  if (name === 'icon') return document.querySelector('.marky-action');
+  return $('tree').querySelector(`[data-id="${name}"]`);
+}
+function posOf(name, scale) {
+  const el = targetEl(name);
+  if (el && el.offsetParent) {
+    const r = el.getBoundingClientRect(), b = document.querySelector('.browser').getBoundingClientRect();
+    const x = (r.left - b.left)/scale + Math.min(30, r.width/scale/2), y = (r.top - b.top)/scale + r.height/scale/2;
+    posCache[name] = [x, y];
+  }
+  return posCache[name] || [260, 300];
+}
+
+// Folder rows live inside the popup iframe: combine the frame's place on the stage with the row's place inside it.
+function rowPos(id, label, scale) {
+  const key = id + label, button = folderButton(id, label);
+  if (button && $(id).style.opacity > .5) {
+    const f = $(id).querySelector('iframe').getBoundingClientRect(), b = document.querySelector('.browser').getBoundingClientRect(), r = button.getBoundingClientRect();
+    posCache[key] = [(f.left - b.left)/scale + r.left + Math.min(46, r.width/2), (f.top - b.top)/scale + r.top + r.height/2];
+  }
+  return posCache[key] || [380, 300];
+}
+const SPOTS = { start:[400,170], rest:[190,330] };
+function spot(target, scale) {
+  if (SPOTS[target]) return SPOTS[target];
+  if (target.includes(':')) { const [id, label] = target.split(':'); return rowPos(id, label, scale); }
+  return posOf(target, scale);
+}
+// Cursor glides to each waypoint just before its time and clicks where a waypoint is marked as a click.
+function drawCursor(l, points, scale) {
+  let idx = points.findIndex(([time]) => l < time);
+  let pos;
+  if (idx === 0) pos = spot(points[0][1], scale);
+  else if (idx === -1) pos = spot(points.at(-1)[1], scale);
+  else {
+    const [t0, a] = points[idx-1], [t1, z] = points[idx], d = Math.min(.55, t1 - t0 - .05);
+    const p = ease((l - (t1 - d)) / d), from = spot(a, scale), to = spot(z, scale);
+    pos = [lerp(from[0], to[0], p), lerp(from[1], to[1], p)];
+  }
+  $('cursor').style.display = 'block';
+  $('cursor').style.transform = `translate(${pos[0]}px,${pos[1]}px)`;
+  const click = points.filter(([time,,c]) => c && l >= time).at(-1);
+  if (click && l - click[0] < .35) {
+    const p = (l - click[0]) / .35, [x, y] = spot(click[1], scale);
+    $('ripple').style.opacity = 1-p; $('ripple').style.transform = `translate(${x}px,${y}px) scale(${lerp(.4,1.6,p)})`;
+  }
+}
+
+function seek(t) {
+  while (fired < actions.length && actions[fired][0] <= t) actions[fired++][1]();
+  const cur = scenes.find(x => t < x.end) || scenes.at(-1), l = t - cur.start, b = beats[cur.id];
+  const cam = cameraAt(t);
+  $('stage').style.transform = `translate(${cam.x}px,${cam.y}px) scale(${cam.s})`;
+  renderCaption(t);
+
+  let star = false, icon = 'icon-outline32', badge = false, result = '', keys = [], count = -1;
+  $('bubble').style.opacity = 0; $('menu').style.display = 'none'; $('dialog').style.opacity = 0;
+  $('cursor').style.display = 'none'; $('ripple').style.opacity = 0; $('recent').style.opacity = 0;
+  $('stage').style.opacity = 1; $('outro').style.opacity = 0; $('compare').style.opacity = 0; $('sparkles').innerHTML = '';
+
+  if (cur.id === 'tree') {
+    setPage('react');
+    const clickAt = Object.fromEntries(b.clicks);
+    const done = name => l >= clickAt[name];
+    count = b.clicks.filter(([,c]) => l >= c).length;
+    star = done('star');
+    const inBubble = done('star') && !done('other');
+    $('bubble').style.opacity = inBubble ? ease((l-clickAt.star)/.15) : 0;
+    $('menu').style.display = inBubble && done('select') ? 'block' : 'none';
+    const dialogVis = done('other') && l < clickAt.save + .25;
+    $('dialog').style.opacity = dialogVis ? ease((l-clickAt.other)/.15) : 0;
+    const open = new Set(['bar']); if (done('work')) open.add('work'); if (done('projects')) open.add('projects'); if (done('frontend')) open.add('frontend');
+    renderTree(open, done('react') ? 'react' : '');
+    // Cursor travels to each click target.
+    const next = b.clicks.findIndex(([,c]) => l < c);
+    if (next !== -1 || l < clickAt.save + .3) {
+      const idx = next === -1 ? b.clicks.length-1 : next;
+      const [name, c] = b.clicks[idx], prevC = idx ? b.clicks[idx-1][1] : 0;
+      const to = posOf(name, cam.s), from = idx ? posOf(b.clicks[idx-1][0], cam.s) : [300, 330];
+      const p = next === -1 ? 1 : ease((l - prevC - .1) / (c - prevC - .2));
+      $('cursor').style.display = 'block';
+      $('cursor').style.transform = `translate(${lerp(from[0],to[0],p)}px,${lerp(from[1],to[1],p)}px)`;
+    }
+    const last = b.clicks.filter(([,c]) => l >= c).at(-1);
+    if (last && l - last[1] < .35) {
+      const [x,y] = posOf(last[0], cam.s), p = (l-last[1])/.35;
+      $('ripple').style.opacity = 1-p; $('ripple').style.transform = `translate(${x}px,${y}px) scale(${lerp(.4,1.6,p)})`;
+    }
+  }
+  if (cur.id === 'open' || cur.id === 'filter') {
+    setPage('react');
+    const o = scenes.find(s=>s.id==='open'), f = scenes.find(s=>s.id==='filter'), bo = beats.open, bf = beats.filter;
+    const openAt = o.start + bo.open, enterAt = f.start + bf.click;
+    showPopup('popup-a', openAt, enterAt + .15, t);
+    keys = [['клик', o.start+bo.iconClick], ['rea', f.start+bf.typeAt+.3], ['клик', enterAt]].filter(([,x]) => t >= x);
+    star = t > enterAt + .15; icon = star ? 'icon32' : icon;
+    badge = t > enterAt + .2 && t < enterAt + 1.4;
+    if (t > enterAt + .3) result = '✓ Сохранено в React';
+    // Cursor: icon click, then rest beside the popup, then click the found folder.
+    const lo = t - o.start, bClick = f.start + bf.click - o.start;
+    if (t < enterAt + .4) drawCursor(lo, [[0,'start'],[bo.iconClick,'icon',true],[bo.iconClick+.8,'rest'],[bClick-.45,'rest'],[bClick,'popup-a:React',true]], cam.s);
+    // «недавние сверху»: outline the first rows until filtering starts.
+    const rFrom = o.start + bo.recent, rTo = f.start + bf.typeAt;
+    if (t >= rFrom && t < rTo) {
+      const rows = [...popupFrame('popup-a').contentDocument.querySelectorAll('.folder-item')].slice(0, 3);
+      if (rows.length) {
+        const fr = popupFrame('popup-a').getBoundingClientRect(), br = document.querySelector('.browser').getBoundingClientRect();
+        const top = rows[0].getBoundingClientRect(), bottom = rows.at(-1).getBoundingClientRect();
+        Object.assign($('recent').style, { left:`${(fr.left-br.left)/cam.s + 2}px`, top:`${(fr.top-br.top)/cam.s + top.top - 1}px`, width:`${top.width - 4}px`, height:`${bottom.bottom - top.top + 2}px` });
+        $('recent').style.opacity = Math.min(ease((t-rFrom)/.3), 1 - ease((t-rTo+.25)/.25));
+      }
+    }
+  } else showPopup('popup-a', 1, 0, t);
+  if (cur.id === 'create' || cur.id === 'move') {
+    const id = cur.id === 'create' ? 'popup-b' : 'popup-c';
+    setPage(cur.id === 'create' ? 'design' : 'react');
+    showPopup(id, b.open, b.click + .15, l);
+    keys = (cur.id === 'create' ? [['клик', b.iconClick], [b.word, b.typeAt + .2], ['клик', b.click]] : [['клик', b.iconClick], ['клик', b.click]])
+      .filter(([,x]) => l >= x).map(([k,x]) => [k, cur.start+x]);
+    star = cur.id === 'move' || l > b.click + .15; icon = star ? 'icon32' : icon;
+    badge = l > b.click + .2 && l < b.click + 1.4;
+    if (l > b.click + .3) result = cur.id === 'create' ? '✓ Папка «Design systems» создана' : '✓ Перенесено в TypeScript';
+    const row = `${id}:${b.target}`;
+    const path = cur.id === 'create'
+      ? [[0,'start'],[b.iconClick,'icon',true],[b.iconClick+.8,'rest'],[b.click-.5,'rest'],[b.click,row,true]]
+      : [[0,'start'],[b.iconClick,'icon',true],[b.arrive,row],[b.click,row,true]];
+    if (l < b.click + .4) drawCursor(l, path, cam.s);
+  }
+  if (cur.id !== 'create') showPopup('popup-b', 1, 0, t);
+  if (cur.id !== 'move') showPopup('popup-c', 1, 0, t);
+  if (cur.id === 'outro') {
+    star = true; icon = 'icon32';
+    // «Вместо поиска по дереву» → struck out on «пара кликов», two clicks pop in, «Марки» → logo.
+    const keysAt = cue(cur, .55), logoAt = cue(cur, .82);
+    $('stage').style.opacity = 1 - ease(l/.4);
+    const cmpIn = ease(l/.35), cmpOut = ease((l-logoAt+.1)/.3);
+    $('compare').style.opacity = cmpIn * (1-cmpOut);
+    $('compare').style.transform = `translateY(${lerp(30,0,cmpIn) - cmpOut*40}px)`;
+    $('strike').style.width = `${88*ease((l-keysAt)/.35)}%`;
+    [...$('compare-keys').children].forEach((k,i) => {
+      const t0 = keysAt + .1 + i*.14;
+      k.style.opacity = clamp((l-t0)/.1); k.style.transform = `scale(${lerp(.5,1,back((l-t0)/.3))})`;
+    });
+    const p = ease((l-logoAt)/.45);
+    $('outro').style.opacity = p;
+    $('outro').style.transform = `scale(${lerp(.92,1,back((l-logoAt)/.6))})`;
+    // A few deterministic sparkles around the logo.
+    $('sparkles').innerHTML = Array.from({length:14}, (_,i) => {
+      const a = i*2.4, r = 300 + (i%4)*60, ph = (l*1.3 + i*.37) % 1;
+      return `<span class="sparkle" style="left:${540+Math.cos(a)*r}px;top:${720+Math.sin(a)*r*.8 - ph*40}px;opacity:${p*Math.sin(ph*Math.PI)}"></span>`;
+    }).join('');
+  }
+
+  $('counter').style.opacity = count > 0 ? 1 : 0;
+  if (count > 0) {
+    $('count').textContent = count;
+    const last = b.clicks[count-1][1], p = back((l-last)/.25);
+    $('counter').style.transform = `scale(${lerp(1.18,1,p)})`;
+  }
+  setKeys(keys, t);
+  $('star').textContent = star ? '★' : '☆'; $('star').classList.toggle('on', star);
+  const src = `/public/icons/${icon}.png`; if (!$('action-icon').src.endsWith(src)) $('action-icon').src = src;
+  $('badge').style.display = badge ? 'block' : 'none';
+  if ($('result').textContent !== result) $('result').textContent = result;
+  $('result').style.opacity = result ? 1 : 0;
+  $('clock').textContent = t.toFixed(2) + ' / ' + total.toFixed(2);
+}
+
+window.reel = { ready, init, seek };
+{ const theme = new URLSearchParams(location.search).get('theme');
+  if (theme === 'light') document.documentElement.classList.add('light');
+  if (['color','teal','warm'].includes(theme)) document.documentElement.classList.add('color', theme); }
+if (new URLSearchParams(location.search).has('capture')) document.body.classList.add('capture');
+else fetch('/marketing/reels/script-ru-v2.json').then(r=>r.json()).then(async s => {
+  // Manual preview with estimated voice durations.
+  init(s.scenes.map(x => ({ id:x.id, voice: x.speech.length/15 })), s);
+  await ready; seek(0);
+  $('play').onclick = () => { const t0 = performance.now(); const tick = () => { const t = (performance.now()-t0)/1000; seek(Math.min(t,total)); if (t < total) requestAnimationFrame(tick); }; tick(); };
+});
+</script>
+</body>
+</html>

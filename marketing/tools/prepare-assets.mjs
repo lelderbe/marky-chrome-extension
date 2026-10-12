@@ -15,8 +15,10 @@ for(const lang of ['en','ru']){
  const dir=join(root,'marketing/assets',lang);await mkdir(dir,{recursive:true});
  for(const [name] of sequence){
    const source=join(captures,`${lang}-${name}.jpg`), meta=await sharp(source).metadata();
-   if(meta.width!==3456||meta.height!==1988)throw new Error('Capture geometry changed: '+source);
-   await sharp(source).extract({left:0,top:242,width:2560,height:1600}).resize(1280,800).flatten({background:'#f4f7fb'}).png().toFile(join(frames,`${lang}-${name}.png`));
+   const legacy=meta.width===3456&&meta.height===1988;
+   if(!legacy&&(meta.width!==1280||meta.height!==800))throw new Error('Capture geometry changed: '+source);
+   const capture=legacy?sharp(source).extract({left:0,top:242,width:2560,height:1600}):sharp(source);
+   await capture.resize(1280,800).flatten({background:'#f4f7fb'}).png().toFile(join(frames,`${lang}-${name}.png`));
  }
  for(const [name,source] of [['01-save','save-react'],['02-filter','filter-rea'],['03-create','create-full']]){
    await writeFile(join(dir,name+'.png'),await readFile(join(frames,`${lang}-${source}.png`)));

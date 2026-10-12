@@ -1,6 +1,6 @@
-Title: Marky — Save Chrome Bookmarks to the Right Folder
+Title: Marky: Easy Bookmarking
 
-Open Marky, type a folder name, and press Enter. This short demo shows saving a page, filtering bookmark folders, and creating a new folder when there are no matches.
+Save useful pages in just a few steps, with your mouse or keyboard. This short demo shows saving with Enter, finding folders by name, and creating a new folder while saving a bookmark.
 
 Marky works with your existing Chrome bookmarks. No separate account or import. No Marky analytics.
 

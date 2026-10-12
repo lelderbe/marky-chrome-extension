@@ -1,15 +1,15 @@
-Save the page you're reading to the right Chrome bookmark folder — using your keyboard.
+Marky makes saving Chrome bookmarks easy.
 
-Open Marky, type part of a folder name, and press Enter. Your page goes straight into your existing Chrome bookmarks.
+Open Marky and click a folder — your page is saved. Prefer the keyboard? Choose a folder with the arrow keys and press Enter. Just a few steps to keep a useful page and get back to reading.
 
-Made for people who keep articles, documentation, and project references in bookmark folders.
+Have lots of folders? Start typing a name to narrow the list. Recently modified folders stay within easy reach at the top.
 
 WHAT YOU CAN DO
-• Save the current page to any existing bookmark folder.
+• Save the current page quickly by clicking a folder or pressing Enter.
 • Filter folders by name instead of browsing a folder tree.
 • Use Up / Down and Enter to select a folder; Esc closes Marky.
 • See recently modified folders at the top of the list.
-• Create a folder when there are no matching folders: type its name and select “New: …”. Marky creates it in the Bookmarks bar and saves the current page there.
+• Create a folder when there are no matching folders: type its name and select “Create folder …”. Marky creates it in the Bookmarks bar and saves the current page there in the same step.
 • Move an already-bookmarked page to another folder. Choosing a different folder moves the existing bookmark instead of creating another copy.
 • Check the toolbar icon: it is filled when the current page is already bookmarked.
 • Use a light or dark theme that follows your system settings.
@@ -17,12 +17,12 @@ WHAT YOU CAN DO
 GET STARTED
 1. Pin Marky to the Chrome toolbar, or use its keyboard shortcut.
 2. Open a page you want to keep.
-3. Open Marky, type a folder name, and press Enter.
+3. Open Marky and click a folder, or choose one with the arrow keys and press Enter. Search by name if you have lots of folders.
 
 Suggested shortcut: Command+B on macOS; Ctrl+B on Windows and Linux. If it isn't assigned or conflicts with another shortcut, set it at chrome://extensions/shortcuts.
 
 YOUR BOOKMARKS, YOUR BROWSER
-No separate account. No import. Marky works with your existing Chrome bookmark folders.
+No separate account. No import. Marky works directly with your Chrome bookmarks.
 
 Marky does not collect personal data or use analytics. It processes bookmarks and tab information on your device, without sending them to Marky servers. Chrome's own bookmark sync settings remain under your control.
 
