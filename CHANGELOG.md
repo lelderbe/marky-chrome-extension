@@ -9,6 +9,18 @@ Also available in [Russian](CHANGELOG.ru.md).
 
 ## Unreleased
 
+## 1.2.1 — 2026-10-12
+
+### Changed
+
+- Updated English and Russian extension titles and descriptions: “Marky: Easy Bookmarking” and “Marky: Удобные закладки”.
+- Saving headings and first-save guidance explain using a mouse or keyboard.
+- README introduces easy bookmarking and acknowledges Better Bookmark as the inspiration for Marky.
+
+### Fixed
+
+- New folders use the actual Bookmarks bar ID, including profiles with account bookmarks; account storage is preferred when both account and local bars exist.
+
 ## 1.2.0 — 2026-10-11
 
 ### Added

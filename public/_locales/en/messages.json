@@ -1,9 +1,9 @@
 {
   "extensionName": {
-    "message": "Marky — Save Bookmarks to Folders"
+    "message": "Marky: Easy Bookmarking"
   },
   "extensionDescription": {
-    "message": "Save pages to your Chrome bookmark folders with a keyboard shortcut. Find or create a folder and press Enter. No account."
+    "message": "Save pages to Chrome bookmarks in just a few steps, with a click or your keyboard."
   },
   "toggleDescription": {
     "message": "Show or hide Marky"
@@ -26,13 +26,13 @@
     "message": "In the Bookmarks bar. This page will be saved there."
   },
   "savePageTo": {
-    "message": "Save page to…"
+    "message": "Save a bookmark"
   },
   "help": {
     "message": "How to use Marky"
   },
   "firstSaveHint": {
-    "message": "Type part of a folder name and press Enter to save this page."
+    "message": "Save this page by clicking a folder or pressing Enter. To find a folder, start typing its name."
   },
   "openWithShortcut": {
     "message": "Open Marky: $SHORTCUT$",

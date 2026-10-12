@@ -1,8 +1,8 @@
 # Marky
 
-**RU:** Сохраняйте страницы в нужную папку закладок Chrome, не отрывая рук от клавиатуры. Откройте Marky, введите часть названия папки и нажмите Enter.
+**RU:** Marky — удобное расширение для быстрого сохранения закладок Chrome. Откройте Marky и сохраните страницу кликом по папке или клавишей Enter. Всего несколько действий — мышью или с клавиатуры.
 
-**EN:** Save pages to the right Chrome bookmark folder without reaching for the mouse. Open Marky, type part of a folder name, and press Enter.
+**EN:** Marky makes saving Chrome bookmarks easy. Open Marky and save a page by clicking a folder or pressing Enter. Just a few steps, with your mouse or keyboard.
 
 Работает с существующими закладками Chrome. Без отдельного аккаунта, импорта и аналитики. / Works with your existing Chrome bookmarks. No separate account, import, or analytics.
 
@@ -12,13 +12,13 @@
 
 [Материалы для Chrome Web Store / Store assets](marketing/README.md)
 
-![Marky: open, filter a bookmark folder, and save with Enter](marketing/assets/en/demo.gif)
+![Marky: easy bookmarking with a click or Enter](marketing/assets/en/demo.gif)
 
 [Демонстрация на русском](marketing/assets/ru/demo.mp4) / [English demo](marketing/assets/en/demo.mp4)
 
 ## Возможности / Features
 
-- Добавление текущей вкладки в закладки одним кликом
+- Быстрое сохранение текущей страницы: откройте Marky и кликните по папке или нажмите Enter
 - Список папок закладок, отсортированный по дате последнего изменения
 - Фильтрация папок по названию
 - Создание новой папки прямо из фильтра, если совпадений нет (в «Панели закладок»)
@@ -31,7 +31,7 @@
 
 ---
 
-- Add the current tab to bookmarks in one click
+- Save the current page quickly: open Marky and click a folder or press Enter
 - Bookmark folders sorted by last modified date
 - Filter folders by name
 - Create a new folder from the filter when no matches are found (in the Bookmarks bar)
@@ -65,6 +65,12 @@
 On first use, the popup shows brief guidance and the currently assigned shortcut. The guidance hides after the first successful save and remains available through the ‘?’ button. ‘Configure shortcut’ opens `chrome://extensions/shortcuts`. Press the assigned shortcut again to hide the popup.
 
 If the page is already saved, Marky shows its current folder and marks it in the list. Selecting another folder moves the bookmark; selecting its current folder closes the popup without changes. Errors keep the popup open with a Retry action, and a successful save briefly shows ✓ on the toolbar icon.
+
+## Благодарности / Acknowledgements
+
+**RU:** Marky вдохновлён [Better Bookmark](https://github.com/ardcore/chrome-better-bookmark) от ardcore — его минималистичным интерфейсом и удобным поиском папок закладок. Я пользовался этим расширением, а когда оно перестало работать у меня, создал Marky, чтобы сохранить привычный способ работы. Спасибо автору за идею и полезный инструмент.
+
+**EN:** Marky was inspired by [Better Bookmark](https://github.com/ardcore/chrome-better-bookmark) by ardcore, especially its minimal interface and convenient bookmark folder search. I used that extension, and when it stopped working for me, I built Marky to keep the workflow I was used to. Thanks to the author for the idea and a useful tool.
 
 ## Разработка / Development
 
